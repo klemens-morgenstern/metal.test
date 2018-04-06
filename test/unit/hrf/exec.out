@@ -1,0 +1,7 @@
+starting test execution
+exec.cpp(6) assertion succeeded do execute.
+exec.cpp(7) expectation succeeded do execute.
+exec.cpp(9) assertion failed do not execute.
+exec.cpp(10) expectation failed do not execute.
+free tests : { executed : 4, warnings : 1, errors : 1}
+full test report: { executed : 4, warnings : 1, errors : 1}

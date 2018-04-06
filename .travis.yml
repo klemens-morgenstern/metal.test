@@ -1,0 +1,54 @@
+sudo: required
+language: cpp
+compiler:
+- gcc
+os:
+- linux
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - valgrind
+    - python-yaml
+    - gcc-7
+    - g++-7
+    - gdb
+    - cmake3
+    - cmake3-data
+before_script:
+    - export CC=/usr/bin/gcc-7
+    - export CXX=/usr/bin/g++-7
+    - PROJECT_TO_TEST=`basename $TRAVIS_BUILD_DIR`
+    - cd $HOME
+    - wget -O boost_1_64_0.tar.gz https://dl.bintray.com/boostorg/release/1.64.0/source/boost_1_64_0.tar.gz
+    - tar -xf boost_1_64_0.tar.gz > /dev/null
+    - BOOST=$HOME/boost_1_64_0
+    - cd $BOOST
+    - "./bootstrap.sh"
+    - "./b2 toolset=gcc-7 --with-program_options --with-filesystem --with-system --with-coroutine --with-context --with-regex --with-date_time --with-atomic --with-test -j4"
+    - cd $TRAVIS_BUILD_DIR
+    - gdb --version
+    - LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BOOST/stage/lib:$TRAVIS_BUILD_DIR
+script:
+- cmake -DENABLE_COVERAGE:BOOL=TRUE -DBUILD_METAL_TEST_TESTS:BOOL=TRUE -DBUILD_METAL_TEST_EXAMPLES:BOOL=TRUE -DBOOST_ROOT=$BOOST -DCMAKE_BUILD_TYPE=DEBUG  .
+- make -j4
+- cd test
+- ctest . --output-on-failure
+after_success:
+    # Copying Coveralls data to a separate folder
+    - mkdir -p ./coverals
+    - find . -name *.gcda -exec cp "{}" ./coverals/ \;
+    - find . -name *.gcno -exec cp "{}" ./coverals/ \;
+
+    # Preparing Coveralls data by changind data format to a readable one
+    - git clone https://github.com/linux-test-project/lcov.git lcov_dir
+    - GCOV_VERSION="--gcov-tool gcov-7"
+    - LCOV="$TRAVIS_BUILD_DIR/test/lcov_dir/bin/lcov $GCOV_VERSION --compat-libtool"
+    - $LCOV --directory ./coverals --base-directory ./ --capture --output-file ./coverals/coverage.info
+    - $LCOV --remove ./coverals/coverage.info "*boost*" "/usr/*" -o ./coverals/coverage.info
+
+    # Sending data to Coveralls
+    - gem install coveralls-lcov
+    # https://github.com/okkez/coveralls-lcov/issues/2
+    - coveralls-lcov  --source-encoding=ISO-8859-1 ./coverals/coverage.info

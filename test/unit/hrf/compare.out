@@ -1,0 +1,27 @@
+starting test execution
+compare.cpp(9) assertion succeeded [comparison]: 1 < 2; [1 < 2]
+compare.cpp(10) expectation failed [comparison]: 1 < 1; [1 < 1]
+compare.cpp(12) assertion failed [comparison]: 1 > 1; [1 > 1]
+compare.cpp(13) expectation succeeded [comparison]: 2 > 1; [2 > 1]
+compare.cpp(18) report: entering ranged test [{[a1.begin(), a1.end()], [a1.rbegin(), a1.rend()]}]
+compare.cpp(18) assertion failed [comparison]: **range**[0]; [1 > 3]
+compare.cpp(18) assertion failed [comparison]: **range**[1]; [2 > 2]
+compare.cpp(18) assertion succeeded [comparison]: **range**[2]; [3 > 1]
+compare.cpp(18) exiting ranged test: { executed : 3, warnings : 0, errors : 2}
+compare.cpp(19) report: entering ranged test [{[a1.begin(), a1.end()], [a1.begin(), a1.end()]}]
+compare.cpp(19) expectation failed [comparison]: **range**[0]; [1 > 1]
+compare.cpp(19) expectation failed [comparison]: **range**[1]; [2 > 2]
+compare.cpp(19) expectation failed [comparison]: **range**[2]; [3 > 3]
+compare.cpp(19) exiting ranged test: { executed : 3, warnings : 3, errors : 0}
+compare.cpp(21) report: entering ranged test [{[a1.begin(), a1.end()], [a1.rbegin(), a1.rend()]}]
+compare.cpp(21) assertion succeeded [comparison]: **range**[0]; [1 < 3]
+compare.cpp(21) assertion failed [comparison]: **range**[1]; [2 < 2]
+compare.cpp(21) assertion failed [comparison]: **range**[2]; [3 < 1]
+compare.cpp(21) exiting ranged test: { executed : 3, warnings : 0, errors : 2}
+compare.cpp(22) report: entering ranged test [{[a1.begin(), a1.end()], [a1.begin(), a1.end()]}]
+compare.cpp(22) expectation failed [comparison]: **range**[0]; [1 < 1]
+compare.cpp(22) expectation failed [comparison]: **range**[1]; [2 < 2]
+compare.cpp(22) expectation failed [comparison]: **range**[2]; [3 < 3]
+compare.cpp(22) exiting ranged test: { executed : 3, warnings : 3, errors : 0}
+free tests : { executed : 8, warnings : 3, errors : 3}
+full test report: { executed : 8, warnings : 3, errors : 3}

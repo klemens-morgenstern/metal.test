@@ -1,0 +1,7 @@
+starting test execution
+predicate.cpp(8) assertion failed [predicate]: my_predicate(4, 2)
+predicate.cpp(9) expectation succeeded [predicate]: my_predicate(3, 3)
+predicate.cpp(10) assertion succeeded [predicate]: my_predicate(1, 1)
+predicate.cpp(11) expectation failed [predicate]: my_predicate(5, 2)
+free tests : { executed : 4, warnings : 1, errors : 1}
+full test report: { executed : 4, warnings : 1, errors : 1}

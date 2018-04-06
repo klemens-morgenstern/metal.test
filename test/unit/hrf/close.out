@@ -1,0 +1,39 @@
+starting test execution
+close.cpp(9) assertion succeeded [equality]: .9 == 1. +/- .1; [0.89999999999999991 == 1 +/- 0.099999999999999992]
+close.cpp(10) expectation failed [equality]: .9 == 1. +/- .09; [0.89999999999999991 == 1 +/- 0.089999999999999997]
+close.cpp(12) assertion failed [equality]: 90 == 100 +/- 9%; [ 90 == 100 +/- 9 % ]
+close.cpp(13) expectation succeeded [equality]: 90 == 100 +/- 10%; [ 90 == 100 +/- 10 % ]
+close.cpp(15) assertion succeeded [equality]: 1.8 == 2. +/- 0.1~; [ 1.7999999999999998 == 2 +/- 0.099999999999999992 ~ ]
+close.cpp(16) expectation succeeded [equality]: 1.5 == 2. +/- 0.25~; [ 1.5 == 2 +/- 0.25 ~ ]
+close.cpp(21) report: entering ranged test [{[a1.begin(), a1.end()], [a2.begin(), a2.end()]}]
+close.cpp(21) assertion succeeded [equality]: **range**[0]; [1.1000000000000001 == 1 +/- 0.29999999999999999]
+close.cpp(21) assertion succeeded [equality]: **range**[1]; [1.8 == 2 +/- 0.29999999999999999]
+close.cpp(21) assertion succeeded [equality]: **range**[2]; [2.7000000000000002 == 3 +/- 0.29999999999999999]
+close.cpp(21) exiting ranged test: { executed : 3, warnings : 0, errors : 0}
+close.cpp(22) report: entering ranged test [{[a1.begin(), a1.end()], [a2.begin(), a2.end()]}]
+close.cpp(22) expectation succeeded [equality]: **range**[0]; [1.1000000000000001 == 1 +/- 0.19999999999999998]
+close.cpp(22) expectation succeeded [equality]: **range**[1]; [1.8 == 2 +/- 0.19999999999999998]
+close.cpp(22) expectation failed [equality]: **range**[2]; [2.7000000000000002 == 3 +/- 0.19999999999999998]
+close.cpp(22) exiting ranged test: { executed : 3, warnings : 1, errors : 0}
+close.cpp(24) report: entering ranged test [{[a1.begin(), a1.end()], [a2.begin(), a2.end()]}]
+close.cpp(24) assertion succeeded [equality]: **range**[0]~; [ 1.1000000000000001 == 1 +/- 0.099999999999999992 ~ ]
+close.cpp(24) assertion succeeded [equality]: **range**[1]~; [ 1.8 == 2 +/- 0.099999999999999992 ~ ]
+close.cpp(24) assertion succeeded [equality]: **range**[2]~; [ 2.7000000000000002 == 3 +/- 0.099999999999999992 ~ ]
+close.cpp(24) exiting ranged test: { executed : 3, warnings : 0, errors : 0}
+close.cpp(25) report: entering ranged test [{[a1.begin(), a1.end()], [a2.begin(), a2.end()]}]
+close.cpp(25) expectation failed [equality]: **range**[0]~; [ 1.1000000000000001 == 1 +/- 0.049999999999999996 ~ ]
+close.cpp(25) expectation failed [equality]: **range**[1]~; [ 1.8 == 2 +/- 0.049999999999999996 ~ ]
+close.cpp(25) expectation failed [equality]: **range**[2]~; [ 2.7000000000000002 == 3 +/- 0.049999999999999996 ~ ]
+close.cpp(25) exiting ranged test: { executed : 3, warnings : 3, errors : 0}
+close.cpp(27) report: entering ranged test [{[a1.begin(), a1.end()], [a2.begin(), a2.end()]}]
+close.cpp(27) assertion failed [equality]: **range**[0]%; [ 1.1000000000000001 == 1 +/- 5 % ]
+close.cpp(27) assertion failed [equality]: **range**[1]%; [ 1.8 == 2 +/- 5 % ]
+close.cpp(27) assertion failed [equality]: **range**[2]%; [ 2.7000000000000002 == 3 +/- 5 % ]
+close.cpp(27) exiting ranged test: { executed : 3, warnings : 0, errors : 3}
+close.cpp(28) report: entering ranged test [{[a1.begin(), a1.end()], [a2.begin(), a2.end()]}]
+close.cpp(28) expectation succeeded [equality]: **range**[0]%; [ 1.1000000000000001 == 1 +/- 10 % ]
+close.cpp(28) expectation succeeded [equality]: **range**[1]%; [ 1.8 == 2 +/- 10 % ]
+close.cpp(28) expectation succeeded [equality]: **range**[2]%; [ 2.7000000000000002 == 3 +/- 10 % ]
+close.cpp(28) exiting ranged test: { executed : 3, warnings : 0, errors : 0}
+free tests : { executed : 12, warnings : 3, errors : 2}
+full test report: { executed : 12, warnings : 3, errors : 2}

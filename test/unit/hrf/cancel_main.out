@@ -1,0 +1,3 @@
+starting test execution
+cancel_main.cpp(6) critical expectation failed [expression]: false
+cancel_main.cpp(6) report: canceling main: { executed : 1, warnings : 1, errors : 0}

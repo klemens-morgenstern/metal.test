@@ -1,0 +1,10 @@
+starting test execution
+except.cpp(26) assertion succeeded throw no exception.
+except.cpp(27) expectation failed throw no exception.
+except.cpp(29) assertion failed throw any exception.
+except.cpp(30) expectation succeeded throw any exception.
+except.cpp(32) expectation succeeded throw exception [int, double] got [int]
+except.cpp(33) expectation succeeded throw exception [int, double] got [double]
+except.cpp(34) expectation failed throw exception [void*] got [...]
+free tests : { executed : 7, warnings : 2, errors : 1}
+full test report: { executed : 7, warnings : 2, errors : 1}

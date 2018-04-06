@@ -1,0 +1,27 @@
+starting test execution
+not_equal.cpp(13) assertion succeeded [equality]: i != j; [4294967254 != 214]
+not_equal.cpp(14) expectation succeeded [equality]: l != k; [255 != -1]
+not_equal.cpp(15) assertion failed [bitwise equality]: l != k; [0b11111111 != 0b11111111]
+not_equal.cpp(16) expectation succeeded [bitwise equality]: i != j; [0b11111111111111111111111111010110 != 0b11010110]
+not_equal.cpp(21) error entering ranged test [{[arr1.begin(), arr1.end()], [arr2.begin(), arr2.end()]}] with mismatch: 3 != 4
+not_equal.cpp(21) assertion failed [equality]: **range**[0]; [-1 != -1]
+not_equal.cpp(21) assertion failed [equality]: **range**[1]; [0 != 0]
+not_equal.cpp(21) assertion failed [equality]: **range**[2]; [1 != 1]
+not_equal.cpp(21) exiting ranged test: { executed : 3, warnings : 0, errors : 3}
+not_equal.cpp(22) report: entering ranged test [{[arr1.begin(), arr1.end()], [arr2.begin(), arr2.end() - 1]}]
+not_equal.cpp(22) expectation failed [equality]: **range**[0]; [-1 != -1]
+not_equal.cpp(22) expectation failed [equality]: **range**[1]; [0 != 0]
+not_equal.cpp(22) expectation failed [equality]: **range**[2]; [1 != 1]
+not_equal.cpp(22) exiting ranged test: { executed : 3, warnings : 3, errors : 0}
+not_equal.cpp(26) report: entering ranged test [{[arr1.begin(), arr1.end()], [arr2.begin(), arr2.end() - 1]}]
+not_equal.cpp(26) assertion succeeded [bitwise equality]: **range**[0]; [0b11111111111111111111111111111110 != 0b1111111111111111]
+not_equal.cpp(26) assertion failed [bitwise equality]: **range**[1]; [0b0 != 0b0]
+not_equal.cpp(26) assertion failed [bitwise equality]: **range**[2]; [0b1 != 0b1]
+not_equal.cpp(26) exiting ranged test: { executed : 3, warnings : 0, errors : 2}
+not_equal.cpp(27) report: entering ranged test [{[arr1.begin(), arr1.end()], [arr2.begin(), arr2.end() - 1]}]
+not_equal.cpp(27) expectation succeeded [bitwise equality]: **range**[0]; [0b11111111111111111111111111111110 != 0b1111111111111111]
+not_equal.cpp(27) expectation failed [bitwise equality]: **range**[1]; [0b0 != 0b0]
+not_equal.cpp(27) expectation failed [bitwise equality]: **range**[2]; [0b1 != 0b1]
+not_equal.cpp(27) exiting ranged test: { executed : 3, warnings : 2, errors : 0}
+free tests : { executed : 8, warnings : 2, errors : 3}
+full test report: { executed : 8, warnings : 2, errors : 3}

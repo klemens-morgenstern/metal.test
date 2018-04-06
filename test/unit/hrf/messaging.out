@@ -1,0 +1,9 @@
+starting test execution
+messaging.cpp(6) log : my log message
+messaging.cpp(7) checkpoint
+messaging.cpp(8) assertion failed [message]: Some message
+messaging.cpp(9) expectation succeeded [message]: some other message
+messaging.cpp(10) assertion succeeded [message]: Yet another message
+messaging.cpp(11) expectation failed [message]: and another one
+free tests : { executed : 4, warnings : 1, errors : 1}
+full test report: { executed : 4, warnings : 1, errors : 1}

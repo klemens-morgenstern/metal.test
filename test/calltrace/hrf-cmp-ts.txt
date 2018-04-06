@@ -1,0 +1,39 @@
+metal.calltrace   registered calltrace --hex-- [--hex--:foobar()]: {[--hex--:foo()], [--hex--:bar(bool)], [--hex--:foo()], [--hex--:bar(bool)]}, with timestamp --timestamps--
+metal.calltrace   registered calltrace --hex-- [--hex--:foobar()]: {[--hex--:bar(bool)], [--hex--:foo()], [--hex--:bar(bool)], [--hex--:foo()]}, with timestamp --timestamps--
+metal.calltrace   registered calltrace --hex-- [--hex--:foobar()]: {[--hex--:foo()]}, with timestamp --timestamps--
+metal.calltrace   registered calltrace --hex-- [--hex--:foobar()]: {[--hex--:foo()], [--hex--:bar(bool)], [--hex--:foo()], [--hex--:bar(bool)], [--hex--:foo()]}, with timestamp --timestamps--
+metal.calltrace   registered calltrace --hex-- [--hex--:bar(bool)]: {}, with timestamp --timestamps--
+metal.calltrace   registered calltrace --hex-- [--hex--:bar(bool)]: {[--hex--:dummy_vector<int>::size() const]}, with timestamp --timestamps--
+metal.calltrace   registered calltrace --hex-- [--hex--:foo()]: {[--hex--:dummy_vector<int>::push_back(int&&) const]}, with timestamp --timestamps--
+metal.calltrace entering function [--hex--:foobar()], with timestamp --timestamps--
+metal.calltrace entering function [--hex--:foo()], with timestamp --timestamps--
+metal.calltrace.error mismatch in calltrace --hex-- at pos 1 {[--hex--:foo()] != [--hex--:bar(bool)]}
+metal.calltrace entering function [--hex--:dummy_vector<int>::push_back(int&&) const], with timestamp --timestamps--
+metal.calltrace  exiting function [--hex--:dummy_vector<int>::push_back(int&&) const], with timestamp --timestamps--
+metal.calltrace  exiting function [--hex--:foo()], with timestamp --timestamps--
+metal.calltrace entering function [--hex--:bar(bool)], with timestamp --timestamps--
+metal.calltrace.error mismatch in calltrace --hex-- at pos 2 {[--hex--:bar(bool)] != [--hex--:foo()]}
+metal.calltrace.error overflow in calltrace --hex-- with size 1 at [--hex--:bar(bool)]
+metal.calltrace  exiting function [--hex--:bar(bool)], with timestamp --timestamps--
+metal.calltrace entering function [--hex--:foo()], with timestamp --timestamps--
+metal.calltrace.error mismatch in calltrace --hex-- at pos 3 {[--hex--:foo()] != [--hex--:bar(bool)]}
+metal.calltrace.error overflow in calltrace --hex-- with size 1 at [--hex--:foo()]
+metal.calltrace entering function [--hex--:dummy_vector<int>::push_back(int&&) const], with timestamp --timestamps--
+metal.calltrace  exiting function [--hex--:dummy_vector<int>::push_back(int&&) const], with timestamp --timestamps--
+metal.calltrace  exiting function [--hex--:foo()], with timestamp --timestamps--
+metal.calltrace entering function [--hex--:bar(bool)], with timestamp --timestamps--
+metal.calltrace.error mismatch in calltrace --hex-- at pos 4 {[--hex--:bar(bool)] != [--hex--:foo()]}
+metal.calltrace.error overflow in calltrace --hex-- with size 1 at [--hex--:bar(bool)]
+metal.calltrace entering function [--hex--:dummy_vector<int>::size() const], with timestamp --timestamps--
+metal.calltrace  exiting function [--hex--:dummy_vector<int>::size() const], with timestamp --timestamps--
+metal.calltrace  exiting function [--hex--:bar(bool)], with timestamp --timestamps--
+metal.calltrace  exiting function [--hex--:foobar()], with timestamp --timestamps--
+metal.calltrace.error incomplete in calltrace --hex-- stopped 4/5
+metal.calltrace unregistered calltrace --hex-- executed 1 times, with 0 errors, with timestamp --timestamps--
+metal.calltrace unregistered calltrace --hex-- executed 1 times, with 4 errors, with timestamp --timestamps--
+metal.calltrace unregistered calltrace --hex-- executed 1 times, with 3 errors, with timestamp --timestamps--
+metal.calltrace unregistered calltrace --hex-- executed 1 times, with 1 errors, with timestamp --timestamps--
+metal.calltrace unregistered calltrace --hex-- executed 1 times, with 0 errors, with timestamp --timestamps--
+metal.calltrace unregistered calltrace --hex-- executed 1 times, with 0 errors, with timestamp --timestamps--
+metal.calltrace unregistered calltrace --hex-- executed 2 times, with 0 errors, with timestamp --timestamps--
+metal.calltrace unregistered calltrace --hex-- executed 1 times, with 0 errors, with timestamp --timestamps--

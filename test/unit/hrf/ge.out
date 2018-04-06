@@ -1,0 +1,27 @@
+starting test execution
+ge.cpp(9) assertion failed [comparison]: 1 >= 2; [1 >= 2]
+ge.cpp(10) expectation succeeded [comparison]: 1 >= 1; [1 >= 1]
+ge.cpp(12) assertion succeeded [bitwise comparison]: 0b101 >= 0b100; [0b101 >= 0b100]
+ge.cpp(13) expectation failed [bitwise comparison]: 0b101 >= 0b010; [0b101 >= 0b10]
+ge.cpp(18) report: entering ranged test [{[a1.begin(), a1.end()], [a2.begin(), a2.end()]}]
+ge.cpp(18) assertion succeeded [comparison]: **range**[0]; [1 >= 1]
+ge.cpp(18) assertion succeeded [comparison]: **range**[1]; [2 >= 1]
+ge.cpp(18) assertion succeeded [comparison]: **range**[2]; [3 >= 2]
+ge.cpp(18) exiting ranged test: { executed : 3, warnings : 0, errors : 0}
+ge.cpp(19) report: entering ranged test [{[a2.begin(), a2.end()], [a1.begin(), a1.end()]}]
+ge.cpp(19) expectation succeeded [comparison]: **range**[0]; [1 >= 1]
+ge.cpp(19) expectation failed [comparison]: **range**[1]; [1 >= 2]
+ge.cpp(19) expectation failed [comparison]: **range**[2]; [2 >= 3]
+ge.cpp(19) exiting ranged test: { executed : 3, warnings : 2, errors : 0}
+ge.cpp(21) report: entering ranged test [{[a1.begin(), a1.end()], [a2.begin(), a2.end()]}]
+ge.cpp(21) assertion succeeded [bitwise comparison]: **range**[0]; [0b1 >= 0b1]
+ge.cpp(21) assertion failed [bitwise comparison]: **range**[1]; [0b10 >= 0b1]
+ge.cpp(21) assertion succeeded [bitwise comparison]: **range**[2]; [0b11 >= 0b10]
+ge.cpp(21) exiting ranged test: { executed : 3, warnings : 0, errors : 1}
+ge.cpp(22) report: entering ranged test [{[a2.begin(), a2.end()], [a1.begin(), a1.end()]}]
+ge.cpp(22) expectation succeeded [bitwise comparison]: **range**[0]; [0b1 >= 0b1]
+ge.cpp(22) expectation failed [bitwise comparison]: **range**[1]; [0b1 >= 0b10]
+ge.cpp(22) expectation failed [bitwise comparison]: **range**[2]; [0b10 >= 0b11]
+ge.cpp(22) exiting ranged test: { executed : 3, warnings : 2, errors : 0}
+free tests : { executed : 8, warnings : 3, errors : 2}
+full test report: { executed : 8, warnings : 3, errors : 2}

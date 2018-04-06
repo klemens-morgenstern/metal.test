@@ -1,0 +1,4 @@
+starting test execution
+fail_test.cpp(6) assertion failed [expression]: false
+free tests : { executed : 1, warnings : 0, errors : 1}
+full test report: { executed : 1, warnings : 0, errors : 1}

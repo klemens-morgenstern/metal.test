@@ -1,0 +1,7 @@
+starting test execution
+cancel_case.cpp(11) entering test case [my test case]
+cancel_case.cpp(6) critical assertion failed [expression]: false
+    canceling test case [my test case]: { executed : 1, warnings : 0, errors : 1}
+cancel_case.cpp(12) expectation failed [expression]: false
+free tests : { executed : 1, warnings : 1, errors : 0}
+full test report: { executed : 2, warnings : 1, errors : 1}

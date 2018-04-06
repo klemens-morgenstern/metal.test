@@ -1,0 +1,7 @@
+monitor reset init
+monitor halt
+monitor arm semihosting enable
+load
+monitor reset halt
+monitor halt
+continue

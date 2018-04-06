@@ -1,0 +1,38 @@
+/**
+ * @file   metal/test/calltrace.def
+ * @date   01.05.2017
+ * @author Klemens D. Morgenstern
+ *
+
+
+
+
+ */
+
+struct metal_calltrace_
+{
+    const void * fn;
+    
+    const void ** content;
+    const int content_size;
+    
+    const int repeat;
+    const int skip;
+        
+	int to_skip;
+    int errored;
+    int repeated;
+    int current_position;
+    int start_depth;
+};
+
+#if defined(ULLONG_MAX)
+typedef unsigned long long metal_timestamp_t;
+#else
+typedef unsigned long metal_timestamp_t;
+#endif
+
+metal_timestamp_t metal_timestamp() __attribute__((no_instrument_function));
+
+int __metal_set_calltrace  (struct metal_calltrace_ * ct) __attribute__((no_instrument_function));
+int __metal_reset_calltrace(struct metal_calltrace_ * ct) __attribute__((no_instrument_function));

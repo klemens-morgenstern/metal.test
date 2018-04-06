@@ -1,0 +1,7 @@
+starting test execution
+run_case.cpp(11) entering test case [my test case]
+run_case.cpp(6) assertion failed [expression]: false
+run_case.cpp(11) exiting test case [my test case]: { executed : 1, warnings : 0, errors : 1}
+run_case.cpp(12) expectation failed [expression]: false
+free tests : { executed : 1, warnings : 1, errors : 0}
+full test report: { executed : 2, warnings : 1, errors : 1}

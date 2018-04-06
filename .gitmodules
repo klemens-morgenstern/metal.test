@@ -1,0 +1,9 @@
+[submodule "libs/fmt"]
+	path = libs/fmt
+	url = https://github.com/fmtlib/fmt.git
+[submodule "libs/rapidjson"]
+	path = libs/rapidjson
+	url = https://github.com/miloyip/rapidjson.git
+[submodule "libs/pegtl"]
+	path = libs/pegtl
+	url = https://github.com/ColinH/PEGTL.git

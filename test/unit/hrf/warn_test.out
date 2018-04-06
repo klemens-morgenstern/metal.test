@@ -1,0 +1,4 @@
+starting test execution
+warn_test.cpp(6) expectation failed [expression]: false
+free tests : { executed : 1, warnings : 1, errors : 0}
+full test report: { executed : 1, warnings : 1, errors : 0}

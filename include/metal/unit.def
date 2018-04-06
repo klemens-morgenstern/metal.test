@@ -1,0 +1,157 @@
+/**
+ * @file   metal/backend.def
+ * @date   25.10.2016
+ * @author Klemens D. Morgenstern
+ *
+
+ */
+#ifndef METAL_BACKEND_DEF_
+#define METAL_BACKEND_DEF_
+
+typedef enum __metal_level_t
+{
+    __metal_level_assert,
+    __metal_level_expect,
+} __metal_level;
+
+typedef enum __metal_oper_t
+{
+    __metal_oper_enter_case,
+    __metal_oper_exit_case,
+    __metal_oper_enter_ranged,
+    __metal_oper_exit_ranged,
+    __metal_oper_log,
+    __metal_oper_checkpoint,
+    __metal_oper_message,
+    __metal_oper_plain,
+    __metal_oper_predicate,
+    __metal_oper_equal,
+    __metal_oper_not_equal,
+    __metal_oper_close,
+    __metal_oper_close_rel,
+    __metal_oper_close_perc,
+    __metal_oper_ge,
+    __metal_oper_greater,
+    __metal_oper_le,
+    __metal_oper_lesser,
+    __metal_oper_exception,
+    __metal_oper_any_exception,
+    __metal_oper_no_exception,
+    __metal_oper_no_exec,
+    __metal_oper_exec,
+    __metal_oper_report
+} __metal_oper;
+
+extern int __metal_status  ;
+extern int __metal_critical;
+extern int __metal_errored;
+
+void __metal_call(void (*func)(), const char * msg,
+               const char * file, int line);
+
+void __metal_impl(__metal_level lvl,
+               __metal_oper oper,
+               int condition,
+               int bitwise,
+               const char* str1,
+               const char* str2,
+               const char* str3,
+               const char* file,
+               int line);
+
+int __metal_report();
+
+#define __METAL_BITWISE_STEP(Lhs, Rhs, Index, Oper) (((Lhs >> Index) & 1) Oper ((Rhs >> Index) & 1))
+
+#define __METAL_BITWISE_8(Lhs, Rhs, Oper, Chain) \
+    ((Lhs & 1) Oper (Rhs & 1))                   \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x1, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x2, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x3, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x4, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x5, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x6, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x7, Oper)
+
+#define __METAL_BITWISE_16(Lhs, Rhs, Oper, Chain) \
+    __METAL_BITWISE_8(Lhs, Rhs, Oper, Chain)        \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x8, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x9, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0xA, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0xB, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0xC, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0xD, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0xE, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0xF, Oper)
+
+#define __METAL_BITWISE_32(Lhs, Rhs, Oper, Chain) \
+    __METAL_BITWISE_16(Lhs, Rhs, Oper, Chain)        \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x10, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x11, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x12, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x13, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x14, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x15, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x16, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x17, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x18, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x19, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x1A, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x1B, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x1C, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x1D, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x1E, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x1F, Oper)
+
+#define __METAL_BITWISE_64(Lhs, Rhs, Oper, Chain)    \
+    __METAL_BITWISE_32(Lhs, Rhs, Oper, Chain)        \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x20, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x21, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x22, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x23, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x24, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x25, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x26, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x27, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x28, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x29, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x2A, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x2B, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x2C, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x2D, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x2E, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x2F, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x30, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x31, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x32, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x33, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x34, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x35, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x36, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x37, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x38, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x39, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x3A, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x3B, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x3C, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x3D, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x3E, Oper) \
+    Chain __METAL_BITWISE_STEP(Lhs, Rhs, 0x3F, Oper)
+
+#define __METAL_BITWISE_SIZE(Lhs, Rhs) ((sizeof(Lhs) >= sizeof(Rhs)) ? sizeof(Lhs) : sizeof(Rhs))
+
+#define METAL_CONCAT_IMPL( x, y ) x##y
+#define METAL_CONCAT( x, y ) METAL_CONCAT_IMPL( x, y )
+
+#define METAL_STRINGIZE(x) METAL_STRINGIZE2(x)
+#define METAL_STRINGIZE2(x) #x
+#define METAL_LOCATION_STR() __FILE__ "(" METAL_STRINGIZE(__LINE__) ")"
+
+#define __METAL_PP_NARG(...)  __METAL_PP_NARG_(__VA_ARGS__,__METAL_PP_RSEQ_N())
+#define __METAL_PP_NARG_(...) __METAL_PP_ARG_N(__VA_ARGS__)
+#define __METAL_PP_ARG_N(_1, _2, _3, _4, _5, _6, _7, _8, _9,_A, _B, _C, _D, _E, _F, N,...) N
+#define __METAL_PP_RSEQ_N() F, E, D, C, B, A, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
+
+#define METAL_OVERLOAD(Macro, Args...) METAL_CONCAT(Macro, __METAL_PP_NARG(Args)) (Args)
+
+#endif

@@ -1,0 +1,17 @@
+/**
+ * @file   metal/test/calltrace
+ * @date   02.05.2017
+ * @author Klemens D. Morgenstern
+ *
+
+
+
+ This header automatically selects either the C or C++ version of the header, depending on that compiler setttings.
+ */
+
+
+#if defined(__cplusplus)
+#include <metal/calltrace.hpp>
+#else
+#include <metal/calltrace.h>
+#endif

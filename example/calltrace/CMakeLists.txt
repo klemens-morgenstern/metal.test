@@ -1,0 +1,8 @@
+add_library(intro intro.cpp)
+add_library(start_c start_c.c)
+add_library(start start.cpp)
+add_library(repeat repeat.cpp)
+add_library(repeat_c repeat_c.c)
+add_library(timestamp timestamp.cpp)
+add_library(timestamp_c timestamp_c.c)
+add_library(wildcard wildcard.cpp)
