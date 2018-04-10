@@ -3,10 +3,6 @@
  * @date   01.05.2017
  * @author Klemens D. Morgenstern
  *
-
-
-
-
  */
 
 struct metal_calltrace_

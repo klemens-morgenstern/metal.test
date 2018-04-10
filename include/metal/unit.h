@@ -1,13 +1,9 @@
 /**
- * @file   metal/test/backend.h
+ * @file   metal/test/unit.h
  * @date   10.08.2016
  * @author Klemens D. Morgenstern
  *
-
-
-
-
- This header provides the C++ version of the test macros.
+ *  This header provides the C++ version of the test macros.
  */
 #ifndef METAL_UNIT_H_
 #define METAL_UNIT_H_
