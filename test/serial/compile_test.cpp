@@ -6,6 +6,7 @@
  */
 
 #include <metal/serial.hpp>
+#include <cstdio>
 
 void test_func()
 {
@@ -52,19 +53,24 @@ int main()
     METAL_SERIAL_ASSERT_NOT_EQUAL(12, i);
     METAL_SERIAL_EXPECT_NOT_EQUAL(32, i);
 
-    METAL_ASSERT_GE(23, i);
-    METAL_EXPECT_GE(12, i);
+    METAL_SERIAL_ASSERT_GE(23, i);
+    METAL_SERIAL_EXPECT_GE(12, i);
 
-    METAL_ASSERT_LE(i++, 11);
-    METAL_EXPECT_LE(23, ++i);
+    METAL_SERIAL_ASSERT_LE(i++, 11);
+    METAL_SERIAL_EXPECT_LE(23, ++i);
 
-    METAL_ASSERT_GREATER(i, 12);
-    METAL_EXPECT_GREATER(i, 32);
+    METAL_SERIAL_ASSERT_GREATER(i, 12);
+    METAL_SERIAL_EXPECT_GREATER(i, 32);
 
-    METAL_ASSERT_LESSER(i++, 92);
-    METAL_EXPECT_LESSER(++i, 12);
+    METAL_SERIAL_ASSERT_LESSER(i++, 92);
+    METAL_SERIAL_EXPECT_LESSER(++i, 12);
 
-    METAL_EXIT(0);
+    METAL_SERIAL_TEST_EXIT();
 
     return 0;
+}
+
+void  write_metal_serial(char c)
+{
+    std::putchar(c);
 }

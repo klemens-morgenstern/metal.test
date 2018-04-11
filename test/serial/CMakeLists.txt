@@ -1,2 +1,2 @@
-add_library(serial_compile_test_c   STATIC compile_test.c)
-add_library(serial_compile_test_cpp STATIC compile_test.cpp)
+add_executable(serial_compile_test_c   compile_test.c)
+add_executable(serial_compile_test_cpp compile_test.cpp)

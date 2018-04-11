@@ -87,6 +87,10 @@ add_library(calltrace-impl src/calltrace.c)
 add_executable(runner src/runner.cpp)
 set_target_properties(runner PROPERTIES OUTPUT_NAME metal.runner)
 
+add_executable(serial src/serial.cpp)
+set_target_properties(serial PROPERTIES OUTPUT_NAME metal.serial)
+target_link_libraries(serial Boost::program_options Boost::system Boost::filesystem)
+
 
 if (UNIX)
     target_link_libraries(runner PUBLIC dbg-core dbg-gdb-mi2 dl)
@@ -100,6 +104,7 @@ add_library(metal::runner::gdb-mi2 ALIAS dbg-gdb-mi2)
 add_library(metal::unit ALIAS unit)
 add_library(metal::calltrace ALIAS calltrace)
 add_executable(metal::runner ALIAS runner)
+add_executable(metal::serial ALIAS serial)
 
 option(BUILD_METAL_TEST_TESTS "Build the metal.test tests" FALSE)
 if(BUILD_METAL_TEST_TESTS)
