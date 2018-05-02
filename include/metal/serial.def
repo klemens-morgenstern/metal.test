@@ -16,6 +16,8 @@
 
 void  write_metal_serial(char);
 
+#define _METAL_SERIAL_VERSION_STRING "__metal_serial_version_0"
+
 #define _METAL_SERIAL_WRITE_BYTE(value) \
     write_metal_serial(1);              \
     write_metal_serial(value);          \
@@ -30,11 +32,10 @@ void  write_metal_serial(char);
 #define _METAL_SERIAL_WRITE_STR(value)                 \
     {                                                  \
         unsigned int strlen = 0;                       \
-        for (;value[strlen] != '\0';strlen++);         \
+        while(value[strlen++] != '\0')                 \
         write_metal_serial(strlen);                    \
         for (unsigned int idx = 0u; idx<strlen; idx++) \
             write_metal_serial(idx[value]);            \
-        write_metal_serial('\0');                      \
     }                                                  \
 
 #if defined(__cplusplus)
@@ -51,22 +52,21 @@ void  write_metal_serial(char);
 
 #define __METAL_SERIAL_WRITE_LOCATION_IMPL(CNT) \
     { \
-        asm("__metal_serial_" #CNT ":" );   \
-        extern const void* const __metal_serial_ ## CNT; \
-        const void* const __metal_serial_location = __metal_serial_ ## CNT;  \
-        _METAL_SERIAL_WRITE_MEMORY(&__metal_serial_location, sizeof(void*)); \
+        asm("__metal_serial_" #CNT ":" ); \
+        extern const int __metal_serial_ ## CNT;   \
+        _METAL_SERIAL_WRITE_PTR(&__metal_serial_ ## CNT);  \
     }
 
 #define __METAL_SERIAL_WRITE_LOCATION_IMPL2(CNT) __METAL_SERIAL_WRITE_LOCATION_IMPL(CNT)
 
 #define _METAL_SERIAL_WRITE_LOCATION() __METAL_SERIAL_WRITE_LOCATION_IMPL2(__COUNTER__)
 
-#define METAL_SERIAL_INIT()                                      \
-    for (unsigned int idx = 0u; idx<11; idx++)                   \
-        write_metal_serial(idx["metal rulz"]);                   \
-    int metal_serial_init = 0b0110110001000011;                  \
-    _METAL_SERIAL_WRITE_MEMORY(&metal_serial_init, sizeof(int)); \
-    _METAL_SERIAL_WRITE_LOCATION();                              \
+#define METAL_SERIAL_INIT()                                                         \
+    for (unsigned int idx = 0u; idx<(sizeof(_METAL_SERIAL_VERSION_STRING)-1); idx++)\
+        write_metal_serial(_METAL_SERIAL_VERSION_STRING[idx]);                      \
+    int metal_serial_init = 0b0110110001000011;                                     \
+    _METAL_SERIAL_WRITE_MEMORY(&metal_serial_init, sizeof(int));                    \
+    _METAL_SERIAL_WRITE_LOCATION();                                                 \
     _METAL_SERIAL_WRITE_BYTE('\0')
 
 #if !defined(METAL_OVERLOAD)

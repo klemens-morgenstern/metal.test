@@ -27,8 +27,8 @@
 #include <boost/spirit/home/x3.hpp>
 #include <boost/spirit/home/x3/binary/binary.hpp>
 #include <boost/spirit/home/support/multi_pass.hpp>
-//#include <metal/serial/binary_parser.hpp>
 
+#include <metal/serial.hpp>
 
 int main(int argc, char **argv)
 {
@@ -97,7 +97,6 @@ int main(int argc, char **argv)
             ifstream ifs(vm["config-file"].as<string>());
             po::store(po::parse_config_file(ifs, desc), vm);
         }
-
     }
     catch (boost::program_options::error &err) {
         if (vm.count("help")) {
@@ -109,7 +108,6 @@ int main(int argc, char **argv)
         cerr << desc << endl;
         return 1;
     }
-
 
     if (vm.count("help") || vm.empty()) {
         std::cout << desc << endl;
@@ -137,51 +135,14 @@ int main(int argc, char **argv)
         std::vector<char> intToken;
         std::vector<char> ptrToken;
         //parse the header
-        auto setNullchar  = [&](auto &ctx){nullchar  = x3::_attr(ctx);};
-        auto setIntLength = [&](auto &ctx){intLength = x3::_attr(ctx); intToken.reserve(intLength);};
-        auto addToTokenI  = [&](auto &ctx)
-                            {
-                                if (intLength != idx)
-                                {
-                                    intToken.push_back(x3::_attr(ctx));
-                                    idx++;
-                                }
-                                else
-                                    x3::_pass(ctx) = false;
-                            };
-        auto checkTokenI = [&](auto &ctx){x3::_pass(ctx) = (intLength == idx);};
+#define check_parser(itr, end, rule, value) if (!x3::parse(itr, end, rule, value)) { std::cerr << "Header parsing failed" << #rule << std::endl; return 1;}
 
-        auto setPtrLength = [&](auto &ctx){ptrLength = x3::_attr(ctx); ptrToken.reserve(ptrLength);};
-        auto addToTokenP  = [&](auto &ctx)
-        {
-            if (ptrLength != idx)
-            {
-                ptrToken.push_back(x3::_attr(ctx));
-                idx++;
-            }
-            else
-                x3::_pass(ctx) = false;
-        };
-        auto checkTokenP = [&](auto &ctx){x3::_pass(ctx) = (ptrLength == idx);};
+        check_parser(itr, end, x3::lexeme[_METAL_SERIAL_VERSION_STRING] >> x3::byte_, intLength); //not considering the nullchar currentls
+        check_parser(itr, end, x3::repeat(intLength)[x3::byte_] >> x3::byte_(nullchar), intToken);
+        check_parser(itr, end, x3::byte_, ptrLength);
+        check_parser(itr, end, x3::repeat(ptrLength)[x3::byte_] >> x3::byte_(nullchar), ptrToken);
+#undef check_parser
 
-        auto resetIndex = [&](auto &) {idx = 0;};
-        auto res = x3::parse(itr, end, *(x3::char_ - (x3::eoi | x3::string("metal rulz")))
-                >> "metal rulz" >> x3::byte_[setNullchar]
-                >> x3::byte_[setIntLength]
-                >> +x3::byte_[addToTokenI]
-                >> x3::eps[checkTokenI]
-                >> x3::char_('\0')[resetIndex]
-                >> x3::byte_[setPtrLength]
-                >> +x3::byte_[addToTokenP]
-                >> x3::eps[checkTokenP]
-                >> x3::char_('\0')
-        );
-
-        if (!res)
-        {
-            std::cerr << "Header parsing failed" << std::endl;
-            return 1;
-        }
         //0b11001100
         //  11000011
         switch (intLength)
@@ -222,34 +183,31 @@ int main(int argc, char **argv)
         else
             for (auto i = 0u; i<ptrLength; i++)
                 reinterpret_cast<char*>(&initLoc)[(ptrLength - i) - 1] = ptrToken[i];
-
-        for (auto i = 0u; i<ptrLength; i++)
-            std::cerr << "foo: " << (int)ptrToken[i] << std::endl;
     }
 
 
     bp::ipstream pin;
     bp::opstream pout;
-    bp::child ch(bp::search_path(addr2line), bp::std_in < pout, bp::std_out > pin);
+    bp::child ch(bp::search_path(addr2line), "--exe=" + binary, bp::std_in < pout, bp::std_out > pin, bp::std_err > stderr);
+    if (!ch.running())
+    {
+        std::cerr << "addr2line not started (" << bp::search_path(addr2line) << ")" << std::endl;
+        return 1;
+    }
 
     std::uint64_t startPtr;
 
 
     pout << std::hex;
-    pout << initLoc << std::endl;
-    std:cerr << std::hex << "Foobar" << initLoc << std::endl;
+    pout << "0x" << initLoc << std::endl;
     std::string line;
 
     while(std::getline(pin, line))
         std::cerr << "Line: " << line << std::endl;
 
-
-
-
-
-    pin.pipe().close();
+    pout.pipe().close();
     ch.wait();
 
-    return 0;
+    return ch.exit_code();
 }
 

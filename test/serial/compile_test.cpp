@@ -7,6 +7,8 @@
 
 #include <metal/serial.hpp>
 #include <cstdio>
+#include <memory>
+#include <iostream>
 
 void test_func()
 {
@@ -19,8 +21,16 @@ void test_func()
     METAL_SERIAL_ASSERT_EXECUTE();
 }
 
-int main()
+FILE * file_ptr;
+
+int main(int argc, char ** argv)
 {
+    if (argc > 1)
+        file_ptr = std::fopen(argv[1], "w");
+    else
+        file_ptr = stdout;
+
+
     METAL_SERIAL_INIT();
     int i = 42;
 
@@ -67,10 +77,11 @@ int main()
 
     METAL_SERIAL_TEST_EXIT();
 
+    std::fclose(file_ptr);
     return 0;
 }
 
 void  write_metal_serial(char c)
 {
-    std::putchar(c);
+    std::putc(c, file_ptr);
 }

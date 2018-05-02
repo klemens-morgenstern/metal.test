@@ -19,8 +19,15 @@ void test_func()
     METAL_SERIAL_ASSERT_EXECUTE();
 }
 
-int main()
+FILE * file_ptr;
+
+int main(int argc, char ** args)
 {
+    if (argc > 1)
+        file_ptr = fopen(args[1], "w");
+    else
+        file_ptr = stdout;
+
     METAL_SERIAL_INIT();
     int i = 42;
 
@@ -67,10 +74,11 @@ int main()
 
     METAL_SERIAL_EXIT(0);
 
+    fclose(file_ptr);
     return 0;
 }
 
 void  write_metal_serial(char c)
 {
-    putchar(c);
+    putc(c, file_ptr);
 }
