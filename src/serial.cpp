@@ -29,7 +29,7 @@
 #include <boost/algorithm/string/trim_all.hpp>
 
 #include "serial/implementation.hpp"
-
+#include "serial/core_functions.hpp"
 
 
 namespace po = boost::program_options;
@@ -226,8 +226,10 @@ int main(int argc, char **argv)
             auto f = boost::dll::import<void(std::unordered_map<std::string, metal::serial::plugin_function_t> &)>(lib, "metal_serial_setup_entries");
             f(macros);
         }
-
-        return run_serial(opt.binary, opt.source_dir, opt.addr2line, itr, end, nullchar, intLength, ptrLength, macros, init_loc, endianess);
+        macros.emplace("METAL_SERIAL_PRINTF", printf_impl);
+        macros.emplace("METAL_SERIAL_EXIT",   exit_impl);
+        return run_serial(opt.binary, opt.source_dir, opt.addr2line, itr, end, nullchar,
+                          intLength, ptrLength, macros, init_loc, endianess);
     }
     catch (parser_exception & pe)
     {

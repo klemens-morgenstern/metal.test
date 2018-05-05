@@ -41,11 +41,13 @@ void  write_metal_serial(char);
 
 #endif
 
+#define _METAL_SERIAL_WRITE_UINT(value) _METAL_SERIAL_WRITE_INT(value)
+
 #define _METAL_SERIAL_WRITE_STR(value)                 \
     {                                                  \
         unsigned int strlen = 0;                       \
-        while(value[strlen++] != '\0')                 \
-        write_metal_serial(strlen);                    \
+        while(value[strlen++] != '\0');                \
+        write_metal_serial(strlen-1);                  \
         for (unsigned int idx = 0u; idx<strlen; idx++) \
             write_metal_serial(idx[value]);            \
     }                                                  \

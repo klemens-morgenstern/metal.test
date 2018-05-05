@@ -248,7 +248,7 @@ int run_serial(const std::string binary, const boost::filesystem::path& source_d
             std::cerr << "Could not verify start sequence '" << macro_name << "', " << macro_args.size()  << std::endl;
             return 2;
         }
-        std::clog << "Initializing metal serial from " << file_name << ":" << line_number << std::endl;
+        std::cerr << "Initializing metal serial from " << file_name << ":" << line_number << std::endl;
     }
     else
         return 2;
@@ -313,16 +313,17 @@ struct session_impl : metal::serial::session
         check_parser(x3::parse(itr, end, x3::omit[x3::byte_(size)] >> x3::repeat(size)[x3::char_]
                                                                    >> x3::omit[x3::byte_(nullChar)], res),
                      "Failed to parse string.");
+        return res;
     }
 
     std::vector<char> get_raw() override
     {
         auto size = *itr;
-        std::string res;
+        std::vector<char> res;
         check_parser(x3::parse(itr, end, x3::omit[x3::byte_(size)] >> x3::repeat(size)[x3::byte_]
                                                                    >> x3::omit[x3::byte_(nullChar)], res),
                      "Failed to parse raw data.");
-
+        return res;
     }
 
 
