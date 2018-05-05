@@ -87,7 +87,7 @@ add_library(calltrace-impl src/calltrace.c)
 add_executable(runner src/runner.cpp)
 set_target_properties(runner PROPERTIES OUTPUT_NAME metal.runner)
 
-add_executable(serial src/serial.cpp include/metal/serial/session.hpp)
+add_executable(serial src/serial.cpp include/metal/serial/session.hpp src/serial/implementation.cpp src/serial/implementation.hpp)
 set_target_properties(serial PROPERTIES OUTPUT_NAME metal.serial)
 target_link_libraries(serial Boost::program_options Boost::system Boost::filesystem)
 
