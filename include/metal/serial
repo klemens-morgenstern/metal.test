@@ -1,5 +1,0 @@
-#if defined(__cplusplus)
-#include <metal/serial.hpp>
-#else
-#include <metal/serial.h>
-#endif

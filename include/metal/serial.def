@@ -22,12 +22,24 @@ void  write_metal_serial(char);
     write_metal_serial(1);              \
     write_metal_serial(value);          \
     write_metal_serial('\0');
-        
+
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+
 #define _METAL_SERIAL_WRITE_INT(value)                      \
     write_metal_serial(sizeof(value));                      \
     for (unsigned int idx = 0u; idx < sizeof(value); idx++) \
          write_metal_serial(value >> (idx << 3));           \
-     write_metal_serial('\0');
+     write_metal_serial('\0'); \
+
+#else
+
+#define _METAL_SERIAL_WRITE_INT(value)                      \
+    write_metal_serial(sizeof(value));                      \
+    for (unsigned int idx = sizeof(value) - 1; idx >= 0 ; idx++) \
+         write_metal_serial(value >> (idx << 3));           \
+     write_metal_serial('\0'); \
+
+#endif
 
 #define _METAL_SERIAL_WRITE_STR(value)                 \
     {                                                  \
@@ -38,17 +50,19 @@ void  write_metal_serial(char);
             write_metal_serial(idx[value]);            \
     }                                                  \
 
-#if defined(__cplusplus)
-#define _METAL_SERIAL_WRITE_PTR(value) _METAL_SERIAL_WRITE_INT((std::uintptr_t)value)
-#else
-#define _METAL_SERIAL_WRITE_PTR(value) _METAL_SERIAL_WRITE_INT((uintptr_t)value)
-#endif
+
 
 #define _METAL_SERIAL_WRITE_MEMORY(pointer, size)  \
     write_metal_serial(size);                      \
     for (unsigned int idx = 0u; idx < size; idx++) \
         write_metal_serial(idx[(char*)pointer]);   \
     write_metal_serial('\0');
+
+#if defined(__cplusplus)
+#define _METAL_SERIAL_WRITE_PTR(value) _METAL_SERIAL_WRITE_INT((std::uintptr_t)value)
+#else
+#define _METAL_SERIAL_WRITE_PTR(value) _METAL_SERIAL_WRITE_INT((uintptr_t)value)
+#endif
 
 #define __METAL_SERIAL_WRITE_LOCATION_IMPL(CNT) \
     { \
@@ -67,7 +81,8 @@ void  write_metal_serial(char);
     int metal_serial_init = 0b0110110001000011;                                     \
     _METAL_SERIAL_WRITE_MEMORY(&metal_serial_init, sizeof(int));                    \
     _METAL_SERIAL_WRITE_LOCATION();                                                 \
-    _METAL_SERIAL_WRITE_BYTE('\0')
+
+//    _METAL_SERIAL_WRITE_BYTE('\0')
 
 #if !defined(METAL_OVERLOAD)
     #define METAL_CONCAT_IMPL( x, y ) x##y

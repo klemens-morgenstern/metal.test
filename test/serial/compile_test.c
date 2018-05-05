@@ -72,7 +72,7 @@ int main(int argc, char ** args)
     METAL_SERIAL_ASSERT_LESSER(i++, 92);
     METAL_SERIAL_EXPECT_LESSER(++i, 12);
 
-    METAL_SERIAL_EXIT(0);
+    METAL_SERIAL_EXIT(42);
 
     fclose(file_ptr);
     return 0;
