@@ -159,9 +159,7 @@ struct json_sink_t : data_sink_t
         rj::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
 
         doc.Accept(writer);
-
-        *os << buffer.GetString();
-
+        *os << buffer.GetString() << std::endl;
     }
 
     void log        (const std::string & file, int line, const std::string & message) override
@@ -278,7 +276,7 @@ struct json_sink_t : data_sink_t
 
 boost::optional<json_sink_t> json_sink;
 
-data_sink_t * get_json_sink(std::ostream & os)
+data_sink_t * serial_get_json_sink(std::ostream & os)
 {
     json_sink.emplace();
     json_sink->os = &os;

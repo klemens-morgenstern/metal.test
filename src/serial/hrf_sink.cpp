@@ -155,7 +155,7 @@ struct hrf_sink_t : data_sink_t
 
 boost::optional<hrf_sink_t> hrf_sink;
 
-data_sink_t * get_hrf_sink(std::ostream & os)
+data_sink_t * serial_get_hrf_sink(std::ostream & os)
 {
     hrf_sink.emplace();
     hrf_sink->os = &os;

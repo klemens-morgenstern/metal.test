@@ -1,0 +1,26 @@
+test/serial/compile_test.cpp:33
+a 42 12 test-string 401867 foo-str
+test/serial/compile_test.cpp(55) assertion succeeded [expression]: condition
+test/serial/compile_test.cpp(56) expectation succeeded [expression]: true
+test/serial/compile_test.cpp(58) assertion succeeded [message]: "Some message"
+test/serial/compile_test.cpp(59) expectation succeeded [message]: "Another message"
+test/serial/compile_test.cpp(61) entering test case [test_func]
+test/serial/compile_test.cpp(15) expectation failed do not execute.
+test/serial/compile_test.cpp(16) checkpoint
+test/serial/compile_test.cpp(17) assertion failed do not execute.
+test/serial/compile_test.cpp(18) assertion failed [equality]: ; [21 == 2]
+test/serial/compile_test.cpp(19) expectation failed do not execute.
+test/serial/compile_test.cpp(20) expectation succeeded [equality]: ; [12 == 12]
+test/serial/compile_test.cpp(61) exiting test case [test_func]: { executed : 5, warnings : 2, errors : 2}
+test/serial/compile_test.cpp(63) assertion succeeded [equality]: 12 != 42; [12 != i]
+test/serial/compile_test.cpp(64) expectation succeeded [equality]: 32 != 42; [32 != i]
+test/serial/compile_test.cpp(66) assertion failed [comparison]: 23 >= 42; [23 >= i]
+test/serial/compile_test.cpp(67) expectation failed [comparison]: 12 >= 42; [12 >= i]
+test/serial/compile_test.cpp(69) assertion failed [comparison]: 43 <= 11; [i++ <= 11]
+test/serial/compile_test.cpp(70) expectation succeeded [comparison]: 23 <= 49; [23 <= ++i]
+test/serial/compile_test.cpp(72) assertion succeeded [comparison]: 52 > 12; [i > 12]
+test/serial/compile_test.cpp(73) expectation succeeded [comparison]: 52 > 32; [i > 32]
+test/serial/compile_test.cpp(75) assertion succeeded [comparison]: 53 < 92; [i++ < 92]
+test/serial/compile_test.cpp(76) expectation failed [comparison]: 59 < 12; [++i < 12]
+free tests : { executed : 12, warnings : 2, errors : 2}
+full test report: { executed : 17, warnings : 4, errors : 4}

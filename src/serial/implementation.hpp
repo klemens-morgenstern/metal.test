@@ -32,10 +32,10 @@ struct parser_exception : std::runtime_error {using std::runtime_error::runtime_
 bool init_session(iterator_t & itr, const iterator_t & end, char & nullchar,
                   int & intLength, int & ptrLength, metal::serial::endianess_t &endianess, std::uint64_t &init_loc);
 
-int run_serial(const std::string binary, const boost::filesystem::path& source_dir, const boost::filesystem::path addr2line,
-               iterator_t & itr, const iterator_t & end, char nullchar, int intLength, int ptrLength,
-               const std::unordered_map<std::string, metal::serial::plugin_function_t> & macros, std::uint64_t init_loc,
-               metal::serial::endianess_t endianess);
+int run_serial(const std::string binary, const boost::filesystem::path &source_dir, const boost::filesystem::path addr2line,
+               iterator_t &itr, const iterator_t &end, char nullchar, int intLength, int ptrLength,
+               const std::unordered_map<std::string, metal::serial::plugin_function_t> &macros, std::uint64_t init_loc,
+               metal::serial::endianess_t endianess, bool ignore_exit_code);
 
 std::unique_ptr<metal::serial::session> build_session(iterator_t & itr, const iterator_t & end, char nullchar,
                                                       int int_length, int ptr_length, metal::serial::endianess_t endianess);

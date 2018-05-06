@@ -59,6 +59,8 @@ struct options_t
 
     fs::path log_file;
 
+    bool ignore_exit_code = false;
+
     vector<fs::path> dlls;
 
     vector<boost::dll::shared_library> plugins;
@@ -86,7 +88,7 @@ struct options_t
             ifstream ifs(vm["response-file"].as<string>().c_str());
             if (!ifs)
             {
-                cout << "Could not open the response file\n";
+                cerr << "Could not open the response file\n";
                 exit(1);
             }
             // Read the whole file into a string
@@ -171,7 +173,8 @@ struct options_t
                 ("config-file,E", po::value<string>(), "config file")
                 ("addr2line,A",  po::value<fs::path>(&addr2line)->default_value("addr2line"), "Custom addr2line command")
                 ("source-dir,S", po::value<fs::path>(&source_dir), "root of the source directory")
-                ("log-file,L",   po::value<fs::path>(&log_file), "log file (instead of stderrr)");
+                ("log-file,L",   po::value<fs::path>(&log_file), "log file (instead of stderrr)")
+                ("ignore-exit-code", po::bool_switch(&ignore_exit_code), "ignore the exit code");
 
 
         pos.add("binary", 1);
@@ -232,8 +235,8 @@ int main(int argc, char **argv)
         }
         macros.emplace("METAL_SERIAL_PRINTF", printf_impl);
         macros.emplace("METAL_SERIAL_EXIT",   exit_impl);
-        return run_serial(opt.binary, opt.source_dir, opt.addr2line, itr, end, nullchar,
-                          intLength, ptrLength, macros, init_loc, endianess);
+        return run_serial(opt.binary, opt.source_dir, opt.addr2line, itr, end, nullchar, intLength,
+                          ptrLength, macros, init_loc, endianess, opt.ignore_exit_code);
     }
     catch (parser_exception & pe)
     {

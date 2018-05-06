@@ -13,14 +13,16 @@
 #include <boost/optional.hpp>
 #include "sink.hpp"
 
-static std::string sink_file;
-static std::string format;
-static boost::optional<std::ofstream> fstr;
-static bool no_exit_code{false};
-static std::ostream * sink_str = &std::cout;
-static bool state{true};
-static data_sink_t *data_sink = nullptr;
-
+inline namespace serial_test_globals
+{
+    std::string sink_file;
+    std::string format;
+    boost::optional<std::ofstream> fstr;
+    bool no_exit_code{false};
+    std::ostream *sink_str = &std::cout;
+    bool state{true};
+    data_sink_t *data_sink = nullptr;
+}
 struct statistic
 {
     int executed = 0;
@@ -218,7 +220,7 @@ void metal_serial_expect_lesser    (metal::serial::session& session, const std::
 void metal_serial_test_exit        (metal::serial::session& session, const std::vector<std::string> & args, const std::string & file, int line)
 {
     data_sink->report(free_tests.executed, free_tests.errors, free_tests.warnings, all_tests.executed, all_tests.errors, all_tests.warnings);
-    session.set_exit(all_tests.errors != 0);
+    session.set_exit(no_exit_code ? 0 : all_tests.errors != 0);
 }
 
 
@@ -230,12 +232,14 @@ void metal_serial_test_setup_entries(std::unordered_map<std::string,metal::seria
     {
         fstr.emplace(sink_file);
         sink_str = &*fstr;
+        assert(fstr);
     }
+
     //ok, we setup the logger
     if (format.empty() || (format == "hrf"))
-        data_sink = get_hrf_sink(*sink_str);
+        data_sink = serial_get_hrf_sink(*sink_str);
     else if (format == "json")
-        data_sink = get_json_sink(*sink_str);
+        data_sink = serial_get_json_sink(*sink_str);
     else
         std::cerr << "Unknown format \"" << format << "\"" << std::endl;
 

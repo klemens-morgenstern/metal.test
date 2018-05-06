@@ -8,4 +8,5 @@ add_test(NAME serial_c_test   COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURC
         --exe=$<TARGET_FILE:serial_compile_test_c> --serial=$<TARGET_FILE:serial> --source-dir=${CMAKE_SOURCE_DIR})
 
 add_test(NAME serial_cpp_test COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/run_cpp.py
-        --exe=$<TARGET_FILE:serial_compile_test_cpp> --serial=$<TARGET_FILE:serial> --source-dir=${CMAKE_SOURCE_DIR})
+        --exe=$<TARGET_FILE:serial_compile_test_cpp> --serial=$<TARGET_FILE:serial> --source-dir=${CMAKE_SOURCE_DIR}
+        --bin-dir=${CMAKE_CURRENT_BINARY_DIR})

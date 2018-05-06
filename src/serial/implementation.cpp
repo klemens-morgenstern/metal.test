@@ -155,10 +155,10 @@ struct loaded_file
 
 
 
-int run_serial(const std::string binary, const boost::filesystem::path& source_dir, const boost::filesystem::path addr2line,
-               iterator_t & itr, const iterator_t & end, char nullchar, int intLength, int ptrLength,
-               const std::unordered_map<std::string, metal::serial::plugin_function_t> & macros, std::uint64_t init_loc,
-               endianess_t endianess)
+int run_serial(const std::string binary, const boost::filesystem::path &source_dir, const boost::filesystem::path addr2line,
+               iterator_t &itr, const iterator_t &end, char nullchar, int intLength, int ptrLength,
+               const std::unordered_map<std::string, metal::serial::plugin_function_t> &macros, std::uint64_t init_loc,
+               endianess_t endianess, bool ignore_exit_code)
 {
     bp::ipstream pin;
     bp::opstream pout;
@@ -274,7 +274,7 @@ int run_serial(const std::string binary, const boost::filesystem::path& source_d
     pout.pipe().close();
 
     if (auto exit_code = get_exited(session_p))
-        return *exit_code;
+        return ignore_exit_code ? 0 : *exit_code;
 
     std::cerr << "Ending input " << std::endl;
     return 2;

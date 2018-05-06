@@ -52,8 +52,8 @@ struct data_sink_t
     virtual void no_execute   (const std::string & file, int line, level_t lvl) = 0;
 };
 
-data_sink_t * get_hrf_sink (std::ostream & os);
-data_sink_t * get_json_sink(std::ostream & os);
+data_sink_t * serial_get_hrf_sink (std::ostream & os);
+data_sink_t * serial_get_json_sink(std::ostream & os);
 
 
 #endif /* SINK_HPP_ */
