@@ -81,7 +81,6 @@ void metal_serial_call             (metal::serial::session& session, const std::
 {
     bool enter = session.get_bool(); //true == entering, false == leaving
     auto &name = args.back();
-
     if (enter)
     {
         current_test_cases.emplace(name, statistic{});

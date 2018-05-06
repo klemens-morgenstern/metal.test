@@ -154,8 +154,8 @@ void  write_metal_serial(char);
 
 #endif
 
-#define METAL_SERIAL_CALL_1(Function) _METAL_SERIAL_WRITE_LOCATION(); _METAL_SERIAL_WRITE_BYTE(0); Function(); \
-                                      _METAL_SERIAL_WRITE_LOCATION(); _METAL_SERIAL_WRITE_BYTE(1);
+#define METAL_SERIAL_CALL_1(Function) _METAL_SERIAL_WRITE_LOCATION(); _METAL_SERIAL_WRITE_BYTE(1); Function(); \
+                                      _METAL_SERIAL_WRITE_LOCATION(); _METAL_SERIAL_WRITE_BYTE(0);
 
 #define METAL_SERIAL_CALL_2(Function, Description) METAL_SERIAL_CALL_1(Function)
 #define METAL_SERIAL_CALL(...) METAL_OVERLOAD(METAL_SERIAL_CALL_, __VA_ARGS__)
