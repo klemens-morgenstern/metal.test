@@ -8,16 +8,10 @@
 #ifndef METAL_UNIT_DEF_
 #define METAL_UNIT_DEF_
 
-typedef enum __metal_result_t
-{
-    __metal_result_success = 0b10000000,
-    __metal_result_failed  = 0b00000000
-};
-
 typedef enum __metal_level_t
 {
-    __metal_level_assert = 0b00000000,
-    __metal_level_expect = 0b01000000,
+    __metal_level_assert,
+    __metal_level_expect,
 } __metal_level;
 
 typedef enum __metal_oper_t
