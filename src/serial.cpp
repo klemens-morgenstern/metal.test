@@ -228,7 +228,7 @@ int main(int argc, char **argv)
 #if defined(BOOST_WINDOWS_API)
         _setmode(_fileno(stdin), _O_BINARY);
 #else
-        std::cin.rdbuf(new __gnu_cxx::stdio_filebuf<char>(0, std::ios::out | std::ios::binary));
+        std::cin.rdbuf(new __gnu_cxx::stdio_filebuf<char>(STDIN_FILENO, std::ios::in | std::ios::binary));
 #endif
         std::freopen(nullptr, "rb", stdin);
         auto itr = fstream ? iterator_t(*fstream) : iterator_t(std::cin);

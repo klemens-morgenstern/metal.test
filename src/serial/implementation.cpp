@@ -34,7 +34,7 @@ bool init_session(iterator_t & itr, const iterator_t & end, char & nullchar,
     std::vector<char> intToken;
     std::vector<char> ptrToken;
     //parse the header
-#define check_parser(itr, end, rule, value) if (!x3::parse(itr, end, rule, value)) { std::cerr << "Header parsing failed" << #rule << std::endl; return 1;}
+#define check_parser(itr, end, rule, value) if (!x3::parse(itr, end, rule, value)) { std::cerr << "Header parsing failed " << #rule << std::endl; return 1;}
 
     check_parser(itr, end, x3::lexeme[_METAL_SERIAL_VERSION_STRING] >> x3::byte_, intLength); //not considering the nullchar currentls
     check_parser(itr, end, x3::repeat(intLength)[x3::byte_] >> x3::byte_(nullchar), intToken);
