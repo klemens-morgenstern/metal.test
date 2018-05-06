@@ -49,7 +49,9 @@ The calltrace provides a way to assert a certain call sequence for functions. Co
 
 ## [metal.serial](https://github.com/klemens-morgenstern/metal.test/wiki/serial.introduction)
 
-The serial library provides a light-weight testing tool for environment that do not have a
+The serial library provides a light-weight testing tool for environments that do not provide access for a debugger.
+It outputs the minimum amount of data from the target device, reads the rest from the source files and provides more detailed report that way.
+E.g. it provides a printf-alternative that does the actual formatting on the host side, thus providing formatted output without required heap usage on the target.
 
 
 # Documentation

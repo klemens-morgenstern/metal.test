@@ -209,7 +209,7 @@ int run_serial(const std::string binary, const boost::filesystem::path &source_d
 
     std::string file_name;
     int line_number;
-    auto get_loc = [&, addr2lineRegex = std::regex{"^((?:\\w:)?[^:]+):(\\d+)\\s*"}](std::uint64_t location)
+    auto get_loc = [&, addr2lineRegex = std::regex{"^((?:\\w:)?[^:]+):(\\d+)\\s*(?:\\(discriminator \\d+\\))?"}](std::uint64_t location)
     {
         std::string line;
         std::smatch match;
@@ -222,7 +222,7 @@ int run_serial(const std::string binary, const boost::filesystem::path &source_d
                 return true;
         }
         else
-            std::cerr << "Error reading from addr2line" << std::endl;
+            std::cerr << "Error reading from addr2line '" << line << "'" << std::endl;
         return false;
     };
 
