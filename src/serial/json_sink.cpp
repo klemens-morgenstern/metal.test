@@ -1,6 +1,6 @@
 /**
  * @file   sink.cpp
- * @date   12.09.2016
+ * @date   06.05.2018
  * @author Klemens D. Morgenstern
  *
 
@@ -24,12 +24,12 @@ inline static const char* descr(level_t lvl)
 {
     switch (lvl)
     {
-    case level_t::assertion:
-        return "assertion";
-    case level_t::expect:
-        return "expectation";
-    default:
-        return "";
+        case level_t::assertion:
+            return "assertion";
+        case level_t::expect:
+            return "expectation";
+        default:
+            return "";
     }
 }
 
@@ -93,140 +93,16 @@ struct json_sink_t : data_sink_t
         return val;
     }
 
-    rj::Value check(const std::string & file, int line, bool condition, level_t lvl, bool critical, int idx)
+    rj::Value check(const std::string & file, int line, bool condition, level_t lvl)
     {
         auto val = loc(file, line);
         val.AddMember("condition", condition, doc.GetAllocator());
         val.AddMember("lvl",      rj::StringRef(descr(lvl)), doc.GetAllocator());
-        val.AddMember("critical", critical, doc.GetAllocator());
-
-        if (idx != -1)
-            val.AddMember("index", idx, doc.GetAllocator());
 
         return val;
     }
 
     virtual ~json_sink_t() = default;
-    void start() override
-    {
-        doc.SetObject();
-    }
-    void cancel_func(const std::string & file, int line, const std::string & id, int executed, int warnings, int errors) override
-    {
-        auto val = steal();
-        {
-            rj::Value sum;
-            sum.SetObject();
-            sum.AddMember("executed", executed, doc.GetAllocator());
-            sum.AddMember("warnings", warnings, doc.GetAllocator());
-            sum.AddMember("errors",   errors  , doc.GetAllocator());
-            val.AddMember("summary", std::move(sum), doc.GetAllocator());
-        }
-        val.AddMember("result", "cancel", doc.GetAllocator());
-        val.AddMember("exit_id", id,      doc.GetAllocator());
-        val.AddMember("exit_location", loc(file, line), doc.GetAllocator());
-        repush(std::move(val));
-    }
-    void cancel_main  (const std::string & file, int line, int executed, int warnings, int errors) override
-    {
-        while (!vals.empty())
-            repush(steal());
-
-        auto &val = doc;
-        {
-            rj::Value sum;
-            sum.SetObject();
-            sum.AddMember("executed", executed, doc.GetAllocator());
-            sum.AddMember("warnings", warnings, doc.GetAllocator());
-            sum.AddMember("errors",   errors  , doc.GetAllocator());
-            val.AddMember("summary", std::move(sum), doc.GetAllocator());
-        }
-        val.AddMember("exit_type", "from_main", doc.GetAllocator());
-
-        val.AddMember("result", "cancel", doc.GetAllocator());
-        val.AddMember("exit_location", loc(file, line), doc.GetAllocator());
-    }
-    void continue_main(const std::string & file, int line, int executed, int warnings, int errors) override
-    {
-        auto val = steal();
-        {
-            rj::Value sum;
-            sum.SetObject();
-            sum.AddMember("executed", executed, doc.GetAllocator());
-            sum.AddMember("warnings", warnings, doc.GetAllocator());
-            sum.AddMember("errors",   errors  , doc.GetAllocator());
-            val.AddMember("summary", std::move(sum), doc.GetAllocator());
-        }
-        val.AddMember("exit_type", "to_main", doc.GetAllocator());
-
-        val.AddMember("result", "cancel", doc.GetAllocator());
-        val.AddMember("exit_location", loc(file, line), doc.GetAllocator());
-
-        repush(std::move(val));
-    }
-
-    void enter_range (const std::string & file, int line, const std::string & descr) override
-    {
-        auto val = loc(file, line);
-        val.AddMember("type", "range", doc.GetAllocator());
-        val.AddMember("description", descr, doc.GetAllocator());
-
-        rj::Value arr;
-        arr.SetArray();
-        val.AddMember("content", std::move(arr), doc.GetAllocator());
-
-        vals.emplace(std::move(val));
-    }
-    void enter_range_mismatch (const std::string & file, int line,
-                               const std::string & descr, const std::string & lhs, const std::string& rhs) override
-    {
-        auto val = loc(file, line);
-        val.AddMember("type", "range", doc.GetAllocator());
-        val.AddMember("description", descr, doc.GetAllocator());
-
-        rj::Value mismatch;
-        mismatch.SetObject();
-        mismatch.AddMember("lhs", lhs, doc.GetAllocator());
-        mismatch.AddMember("rhs", rhs, doc.GetAllocator());
-        val.AddMember("mismatch", std::move(mismatch), doc.GetAllocator());
-        rj::Value arr;
-        arr.SetArray();
-        val.AddMember("content", std::move(arr), doc.GetAllocator());
-
-        vals.emplace(std::move(val));
-    }
-
-    void exit_range  (const std::string & file, int line, int executed, int warnings, int errors) override
-    {
-        auto val = steal();
-        {
-            rj::Value sum;
-            sum.SetObject();
-            sum.AddMember("executed", executed, doc.GetAllocator());
-            sum.AddMember("warnings", warnings, doc.GetAllocator());
-            sum.AddMember("errors",   errors  , doc.GetAllocator());
-            val.AddMember("summary", std::move(sum), doc.GetAllocator());
-        }
-        val.AddMember("result", "exit", doc.GetAllocator());
-        val.AddMember("exit_location", loc(file, line), doc.GetAllocator());
-        repush(std::move(val));
-    }
-
-    void cancel_case (const std::string & id, int executed, int warnings, int errors) override
-    {
-        auto val = steal();
-        {
-            rj::Value sum;
-            sum.SetObject();
-            sum.AddMember("executed", executed, doc.GetAllocator());
-            sum.AddMember("warnings", warnings, doc.GetAllocator());
-            sum.AddMember("errors",   errors  , doc.GetAllocator());
-            val.AddMember("summary", std::move(sum), doc.GetAllocator());
-        }
-        val.AddMember("result", "cancel", doc.GetAllocator());
-        //add_to_array(std::move(val));
-        repush(std::move(val));
-  }
 
     void enter_case(const std::string & file, int line, const std::string & id) override
     {
@@ -252,7 +128,7 @@ struct json_sink_t : data_sink_t
             val.AddMember("summary", std::move(sum), doc.GetAllocator());
         }
         val.AddMember("result", "exit", doc.GetAllocator());
-     //   add_to_array(std::move(val));
+        //   add_to_array(std::move(val));
 
         repush(std::move(val));
     }
@@ -303,36 +179,26 @@ struct json_sink_t : data_sink_t
         add_to_array(std::move(val));
     }
 
-    void message(const std::string & file, int line, bool condition, level_t lvl, bool critical, int index, const std::string & message) override
+    void message(const std::string & file, int line, bool condition, level_t lvl, const std::string & message) override
     {
-        auto val = check(file, line, condition, lvl, critical, index);
+        auto val = check(file, line, condition, lvl);
         val.AddMember("type",  "message",  doc.GetAllocator());
         val.AddMember("message",  message, doc.GetAllocator());
         add_to_array(std::move(val));
     }
-    void plain  (const std::string & file, int line, bool condition, level_t lvl, bool critical, int index, const std::string & message) override
+    void plain  (const std::string & file, int line, bool condition, level_t lvl, const std::string & message) override
     {
-        auto val = check(file, line, condition, lvl, critical, index);
+        auto val = check(file, line, condition, lvl);
         val.AddMember("type",    "plain",  doc.GetAllocator());
         val.AddMember("message",  message, doc.GetAllocator());
         add_to_array(std::move(val));
     }
 
-    void predicate  (const std::string & file, int line, bool condition, level_t lvl, bool critical, int index,
-                     const std::string & name, const std::string &args) override
-    {
-        auto val = check(file, line, condition, lvl, critical, index);
-        val.AddMember("type", "predicate",  doc.GetAllocator());
-        val.AddMember("name",  name, doc.GetAllocator());
-        val.AddMember("args",  args, doc.GetAllocator());
-        add_to_array(std::move(val));
-    }
-    void equal     (const std::string & file, int line, bool condition, level_t lvl, bool critical, int index, bool bw,
+    void equal     (const std::string & file, int line, bool condition, level_t lvl,
                     const std::string & lhs, const std::string &rhs, const std::string & lhs_val, const std::string & rhs_val) override
     {
-        auto val = check(file, line, condition, lvl, critical, index);
+        auto val = check(file, line, condition, lvl);
         val.AddMember("type", "equal",  doc.GetAllocator());
-        val.AddMember("bitwise", bw, doc.GetAllocator());
         val.AddMember("lhs",        lhs,       doc.GetAllocator());
         val.AddMember("rhs",        rhs,       doc.GetAllocator());
         val.AddMember("lhs_val",    lhs_val,       doc.GetAllocator());
@@ -340,12 +206,11 @@ struct json_sink_t : data_sink_t
         add_to_array(std::move(val));
     }
 
-    void not_equal (const std::string & file, int line, bool condition, level_t lvl, bool critical, int index, bool bw,
+    void not_equal (const std::string & file, int line, bool condition, level_t lvl,
                     const std::string & lhs, const std::string &rhs, const std::string & lhs_val, const std::string & rhs_val) override
     {
-        auto val = check(file, line, condition, lvl, critical, index);
+        auto val = check(file, line, condition, lvl);
         val.AddMember("type", "not_equal",  doc.GetAllocator());
-        val.AddMember("bitwise", bw, doc.GetAllocator());
         val.AddMember("lhs",       lhs,       doc.GetAllocator());
         val.AddMember("rhs",       rhs,       doc.GetAllocator());
         val.AddMember("lhs_val",   lhs_val,       doc.GetAllocator());
@@ -353,57 +218,11 @@ struct json_sink_t : data_sink_t
         add_to_array(std::move(val));
     }
 
-    void close     (const std::string & file, int line, bool condition, level_t lvl, bool critical, int index,
-                    const std::string & lhs, const std::string &rhs, const std::string & tolerance,
-                    const std::string & lhs_val, const std::string & rhs_val, const std::string& tolerance_val) override
-    {
-        auto val = check(file, line, condition, lvl, critical, index);
-        val.AddMember("type", "close",  doc.GetAllocator());
-        val.AddMember("lhs",       lhs,       doc.GetAllocator());
-        val.AddMember("rhs",       rhs,       doc.GetAllocator());
-        val.AddMember("tolerance",tolerance, doc.GetAllocator());
-        val.AddMember("lhs_val",       lhs_val,       doc.GetAllocator());
-        val.AddMember("rhs_val",       rhs_val,       doc.GetAllocator());
-        val.AddMember("tolerance_val",tolerance_val, doc.GetAllocator());
-        add_to_array(std::move(val));
-    }
-
-    void close_rel (const std::string & file, int line, bool condition, level_t lvl, bool critical, int index,
-                    const std::string & lhs, const std::string &rhs, const std::string & tolerance,
-                    const std::string & lhs_val, const std::string & rhs_val, const std::string& tolerance_val) override
-    {
-        auto val = check(file, line, condition, lvl, critical, index);
-        val.AddMember("type", "close_rel",  doc.GetAllocator());
-        val.AddMember("lhs",       lhs,       doc.GetAllocator());
-        val.AddMember("rhs",       rhs,       doc.GetAllocator());
-        val.AddMember("tolerance",tolerance, doc.GetAllocator());
-        val.AddMember("lhs_val",       lhs_val,       doc.GetAllocator());
-        val.AddMember("rhs_val",       rhs_val,       doc.GetAllocator());
-        val.AddMember("tolerance_val",tolerance_val, doc.GetAllocator());
-        add_to_array(std::move(val));
-    }
-
-    void close_per (const std::string & file, int line, bool condition, level_t lvl, bool critical, int index,
-                    const std::string & lhs, const std::string &rhs, const std::string & tolerance,
-                    const std::string & lhs_val, const std::string & rhs_val, const std::string& tolerance_val) override
-    {
-        auto val = check(file, line, condition, lvl, critical, index);
-        val.AddMember("type", "close_per",  doc.GetAllocator());
-        val.AddMember("lhs",       lhs,       doc.GetAllocator());
-        val.AddMember("rhs",       rhs,       doc.GetAllocator());
-        val.AddMember("tolerance",tolerance, doc.GetAllocator());
-        val.AddMember("lhs_val",       lhs_val,       doc.GetAllocator());
-        val.AddMember("rhs_val",       rhs_val,       doc.GetAllocator());
-        val.AddMember("tolerance_val",tolerance_val, doc.GetAllocator());
-        add_to_array(std::move(val));
-    }
-
-    void ge        (const std::string & file, int line, bool condition, level_t lvl, bool critical, int index, bool bw,
+    void ge        (const std::string & file, int line, bool condition, level_t lvl,
                     const std::string & lhs, const std::string &rhs, const std::string & lhs_val, const std::string & rhs_val) override
     {
-        auto val = check(file, line, condition, lvl, critical, index);
+        auto val = check(file, line, condition, lvl);
         val.AddMember("type", "ge",  doc.GetAllocator());
-        val.AddMember("bitwise", bw, doc.GetAllocator());
         val.AddMember("lhs",       lhs,       doc.GetAllocator());
         val.AddMember("rhs",       rhs,       doc.GetAllocator());
         val.AddMember("lhs_val",       lhs_val,       doc.GetAllocator());
@@ -411,10 +230,10 @@ struct json_sink_t : data_sink_t
         add_to_array(std::move(val));
     }
 
-    void greater   (const std::string & file, int line, bool condition, level_t lvl, bool critical, int index,
+    void greater   (const std::string & file, int line, bool condition, level_t lvl,
                     const std::string & lhs, const std::string &rhs, const std::string & lhs_val, const std::string & rhs_val) override
     {
-        auto val = check(file, line, condition, lvl, critical, index);
+        auto val = check(file, line, condition, lvl);
         val.AddMember("type", "greater",  doc.GetAllocator());
         val.AddMember("lhs",       lhs,       doc.GetAllocator());
         val.AddMember("rhs",       rhs,       doc.GetAllocator());
@@ -423,12 +242,11 @@ struct json_sink_t : data_sink_t
         add_to_array(std::move(val));
     }
 
-    void le        (const std::string & file, int line, bool condition, level_t lvl, bool critical, int index, bool bw,
+    void le        (const std::string & file, int line, bool condition, level_t lvl,
                     const std::string & lhs, const std::string &rhs, const std::string & lhs_val, const std::string & rhs_val) override
     {
-        auto val = check(file, line, condition, lvl, critical, index);
+        auto val = check(file, line, condition, lvl);
         val.AddMember("type", "le",  doc.GetAllocator());
-        val.AddMember("bitwise", bw, doc.GetAllocator());
         val.AddMember("lhs",       lhs,       doc.GetAllocator());
         val.AddMember("rhs",       rhs,       doc.GetAllocator());
         val.AddMember("lhs_val",       lhs_val,       doc.GetAllocator());
@@ -436,10 +254,10 @@ struct json_sink_t : data_sink_t
         add_to_array(std::move(val));
     }
 
-    void lesser    (const std::string & file, int line, bool condition, level_t lvl, bool critical, int index,
+    void lesser    (const std::string & file, int line, bool condition, level_t lvl,
                     const std::string & lhs, const std::string &rhs, const std::string & lhs_val, const std::string & rhs_val) override
     {
-        auto val = check(file, line, condition, lvl, critical, index);
+        auto val = check(file, line, condition, lvl);
         val.AddMember("type", "lesser",  doc.GetAllocator());
         val.AddMember("lhs",       lhs,       doc.GetAllocator());
         val.AddMember("rhs",       rhs,       doc.GetAllocator());
@@ -448,41 +266,10 @@ struct json_sink_t : data_sink_t
         add_to_array(std::move(val));
     }
 
-    void exception (const std::string & file, int line, bool condition, level_t lvl, bool critical, int index,
-                    const std::string & got, const std::string & expected) override
+    void no_execute   (const std::string & file, int line, level_t lvl) override
     {
-        auto val = check(file, line, condition, lvl, critical, index);
-        val.AddMember("type", "exception",  doc.GetAllocator());
-        val.AddMember("got",      got,      doc.GetAllocator());
-        val.AddMember("expected", expected, doc.GetAllocator());
-        add_to_array(std::move(val));
-    }
-
-    void any_exception(const std::string & file, int line, bool condition, level_t lvl, bool critical, int index) override
-    {
-        auto val = check(file, line, condition, lvl, critical, index);
-        val.AddMember("type", "any_exception", doc.GetAllocator());
-
-        add_to_array(std::move(val));
-    }
-    void no_exception (const std::string & file, int line, bool condition, level_t lvl, bool critical, int index) override
-    {
-        auto val = check(file, line, condition, lvl, critical, index);
-        val.AddMember("type", "no_exception", doc.GetAllocator());
-
-        add_to_array(std::move(val));
-    }
-    void no_execute   (const std::string & file, int line, bool condition, level_t lvl, bool critical, int index) override
-    {
-        auto val = check(file, line, condition, lvl, critical, index);
+        auto val = check(file, line, false, lvl);
         val.AddMember("type", "no_execute_check", doc.GetAllocator());
-
-        add_to_array(std::move(val));
-    }
-    void execute      (const std::string & file, int line, bool condition, level_t lvl, bool critical, int index) override
-    {
-        auto val = check(file, line, condition, lvl, critical, index);
-        val.AddMember("type", "execute_check", doc.GetAllocator());
 
         add_to_array(std::move(val));
     }
@@ -495,5 +282,6 @@ data_sink_t * get_json_sink(std::ostream & os)
 {
     json_sink.emplace();
     json_sink->os = &os;
+    json_sink->doc.SetObject();
     return &*json_sink;
 }

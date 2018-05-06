@@ -89,7 +89,9 @@ set_target_properties(runner PROPERTIES OUTPUT_NAME metal.runner)
 
 add_executable(serial src/serial.cpp include/metal/serial/session.hpp
                       src/serial/implementation.cpp src/serial/implementation.hpp
-                      src/serial/core_functions.cpp src/serial/core_functions.hpp)
+                      src/serial/core_functions.cpp src/serial/core_functions.hpp
+                      src/serial/test_functions.cpp src/serial/test_functions.hpp
+                      src/serial/sink.hpp src/serial/hrf_sink.cpp src/serial/json_sink.cpp)
 set_target_properties(serial PROPERTIES OUTPUT_NAME metal.serial)
 target_link_libraries(serial Boost::program_options Boost::system Boost::filesystem)
 

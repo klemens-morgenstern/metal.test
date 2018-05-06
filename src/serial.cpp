@@ -30,6 +30,7 @@
 
 #include "serial/implementation.hpp"
 #include "serial/core_functions.hpp"
+#include "serial/test_functions.hpp"
 
 
 namespace po = boost::program_options;
@@ -125,6 +126,9 @@ struct options_t
         load_cfg(true);
 
         po::notify(vm);
+
+        metal_serial_test_setup_options(desc);
+
         for (auto & dll : dlls)
         {
             if (fs::exists(dll))
@@ -220,7 +224,7 @@ int main(int argc, char **argv)
             return 2;
 
         std::unordered_map<std::string, metal::serial::plugin_function_t> macros;
-
+        metal_serial_test_setup_entries(macros);
         for (auto & lib : opt.plugins)
         {
             auto f = boost::dll::import<void(std::unordered_map<std::string, metal::serial::plugin_function_t> &)>(lib, "metal_serial_setup_entries");

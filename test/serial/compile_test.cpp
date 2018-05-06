@@ -18,7 +18,6 @@ void test_func()
     METAL_SERIAL_ASSERT_EQUAL(21,2);
     METAL_SERIAL_EXPECT_NO_EXECUTE();
     METAL_SERIAL_EXPECT_EQUAL(12,12);
-    METAL_SERIAL_ASSERT_EXECUTE();
 }
 
 FILE * file_ptr;
@@ -54,10 +53,10 @@ int main(int argc, char ** argv)
     bool condition = true;
 
     METAL_SERIAL_ASSERT(condition);
-    METAL_SERIAL_EXPECT(condition);
+    METAL_SERIAL_EXPECT(true);
 
-    METAL_SERIAL_ASSERT_MESSAGE(condition);
-    METAL_SERIAL_EXPECT_MESSAGE(condition);
+    METAL_SERIAL_ASSERT_MESSAGE(condition, "Some message");
+    METAL_SERIAL_EXPECT_MESSAGE(condition, "Another message");
 
     METAL_SERIAL_CALL(test_func);
 
