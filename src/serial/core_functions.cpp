@@ -14,7 +14,7 @@ void printf_impl(metal::serial::session& session, const std::vector<std::string>
 {
     auto format = args.at(0);
     format.pop_back();
-    format.erase(format.cbegin());
+    format.erase(format.begin());
     boost::format ft(format);
 
     for (auto itr = args.begin() + 1; itr< args.end(); itr++)
