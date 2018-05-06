@@ -254,7 +254,7 @@ int run_serial(const std::string binary, const boost::filesystem::path &source_d
         return 2;
 
     std::unique_ptr<session> session_p = build_session(itr, end, nullchar, intLength, ptrLength, endianess);
-    while ((itr != end) && !session_p->has_exited())
+    while ((itr != end) && !get_exited(session_p))
     {
         set_session_loc(session_p, "**unknown location**", 00);
         auto loc = session_p->get_ptr();
@@ -396,6 +396,13 @@ struct session_impl : metal::serial::session
         }
     }
 };
+
+
+boost::optional<int> get_exited(std::unique_ptr<metal::serial::session> & session)
+{
+    return static_cast<session_impl*>(session.get())->exited;
+}
+
 
 template<endianess_t endianess_>
 struct session_impl_endian final : session_impl

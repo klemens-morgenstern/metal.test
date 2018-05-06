@@ -49,6 +49,7 @@ int main(int argc, char ** argv)
                         STR("test-string"),
                         MEMORY(cstr, 7));
 
+
     bool condition = true;
 
     METAL_SERIAL_ASSERT(condition);

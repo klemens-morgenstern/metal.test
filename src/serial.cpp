@@ -32,6 +32,11 @@
 #include "serial/core_functions.hpp"
 #include "serial/test_functions.hpp"
 
+#if defined(BOOST_WINDOWS_API)
+#include <fcntl.h>
+#else
+#include <ext/stdio_filebuf.h>
+#endif
 
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
@@ -56,6 +61,7 @@ struct options_t
 
     std::string comp;
     std::string binary;
+    std::string input;
 
     fs::path log_file;
 
@@ -174,7 +180,8 @@ struct options_t
                 ("addr2line,A",  po::value<fs::path>(&addr2line)->default_value("addr2line"), "Custom addr2line command")
                 ("source-dir,S", po::value<fs::path>(&source_dir), "root of the source directory")
                 ("log,L",   po::value<fs::path>(&log_file), "log file (instead of stderrr)")
-                ("ignore-exit-code", po::bool_switch(&ignore_exit_code), "ignore the exit code");
+                ("ignore-exit-code", po::bool_switch(&ignore_exit_code), "ignore the exit code")
+                ("input,I" , po::value<std::string>(&input), "input file, instead of stdin");
 
 
         pos.add("binary", 1);
@@ -214,6 +221,16 @@ int main(int argc, char **argv)
         }
 
         boost::optional<fs::ifstream> fstream;
+        if (!opt.input.empty())
+            fstream.emplace(opt.input, std::fstream::in | std::fstream::binary);
+
+        //hack cin to accept binary data, otherwise the EOF token screws this program.
+#if defined(BOOST_WINDOWS_API)
+        _setmode(_fileno(stdin), _O_BINARY);
+#else
+        std::cin.rdbuf(new __gnu_cxx::stdio_filebuf<char>(0, std::ios::out | std::ios::binary));
+#endif
+        std::freopen(nullptr, "rb", stdin);
         auto itr = fstream ? iterator_t(*fstream) : iterator_t(std::cin);
         const iterator_t end;
 
