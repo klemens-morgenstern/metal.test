@@ -209,7 +209,7 @@ int run_serial(const std::string binary, const boost::filesystem::path &source_d
 
     std::string file_name;
     int line_number;
-    auto get_loc = [&, addr2lineRegex = std::regex{"^((?:\\w:)?[^:]+):(\\d+)\\s*(?:\\(discriminator \\d+\\))?"}](std::uint64_t location)
+    auto get_loc = [&, addr2lineRegex = std::regex{"^((?:\\w:)?[^:]+):(\\d+)(?:\\s+\\(discriminator \\d+\\))?\\s*"}](std::uint64_t location)
     {
         std::string line;
         std::smatch match;
@@ -254,7 +254,7 @@ int run_serial(const std::string binary, const boost::filesystem::path &source_d
         return 2;
 
     std::unique_ptr<session> session_p = build_session(itr, end, nullchar, intLength, ptrLength, endianess);
-    while (itr != end && !get_exited(session_p))
+    while ((itr != end) && !session_p->has_exited())
     {
         set_session_loc(session_p, "**unknown location**", 00);
         auto loc = session_p->get_ptr();
@@ -507,7 +507,6 @@ void set_session_loc(std::unique_ptr<session> & session, const std::string& file
     pi->line = line_number;
 }
 
-boost::optional<int> get_exited(std::unique_ptr<session> & session) {return static_cast<session_impl*>(session.get())->exited;}
 
 std::unique_ptr<session> build_session(iterator_t & itr, const iterator_t & end, char nullchar, int int_length,
                                        int ptr_length, endianess_t endianess)

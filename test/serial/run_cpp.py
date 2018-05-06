@@ -37,7 +37,7 @@ output = proc.communicate()[0].decode().splitlines()
 print (output)
 
 assert output[0].startswith("Initializing metal serial from")
-assert output[1] == "a 42 12 test-string 401867 foo-str"
+assert output[1] == "a 42 12 test-string foo-str"
 
 assert proc.returncode == 0
 

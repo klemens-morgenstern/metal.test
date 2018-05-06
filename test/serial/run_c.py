@@ -38,7 +38,7 @@ with tempfile.NamedTemporaryFile() as temp_json:
     print (output)
 
     assert output[0].startswith("Initializing metal serial from")
-    assert output[1] == "a 42 test-string 401867 str-foo"
+    assert output[1] == "a 42 test-string str-foo"
     assert output[2] == "Exiting serial execution with 42"
 
     assert proc.returncode == 0
