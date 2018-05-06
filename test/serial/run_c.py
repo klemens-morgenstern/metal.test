@@ -35,11 +35,14 @@ with tempfile.NamedTemporaryFile() as temp_json:
     out, err = proc.communicate()
     output = out.decode().splitlines()
 
-    assert proc.returncode == 0
+    print (output)
 
     assert output[0].startswith("Initializing metal serial from")
     assert output[1] == "a 42 test-string 401867 str-foo"
     assert output[2] == "Exiting serial execution with 42"
+
+    assert proc.returncode == 0
+
 
 hrf_proc  = subprocess.Popen([serial, exe, source_dir], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 hrf_proc.stdin.write(bin_output)

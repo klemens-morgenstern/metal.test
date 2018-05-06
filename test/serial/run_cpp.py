@@ -33,10 +33,13 @@ proc = subprocess.Popen([serial, exe, source_dir, "--metal-test-no-exit-code", "
                                   "--metal-test-sink", temp_file], stdin=subprocess.PIPE,  stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
 proc.stdin.write(bin_output)
 output = proc.communicate()[0].decode().splitlines()
-assert proc.returncode == 0
+
+print (output)
 
 assert output[0].startswith("Initializing metal serial from")
 assert output[1] == "a 42 12 test-string 401867 foo-str"
+
+assert proc.returncode == 0
 
 json_output = json.load(open(temp_file))
 
