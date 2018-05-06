@@ -98,9 +98,12 @@ target_link_libraries(serial Boost::program_options Boost::system Boost::filesys
 
 if (UNIX)
     target_link_libraries(runner PUBLIC dbg-core dbg-gdb-mi2 dl)
+    target_link_libraries(serial Boost::program_options Boost::system Boost::filesystem dl)
 else()
     target_link_libraries(runner PUBLIC dbg-core dbg-gdb-mi2)
+    target_link_libraries(serial Boost::program_options Boost::system Boost::filesystem)
 endif()
+
 set_target_properties(runner PROPERTIES LINKFLAGS "-Wl,-rpath=.")
 
 add_library(metal::runner::core ALIAS dbg-core)
