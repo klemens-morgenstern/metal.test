@@ -173,7 +173,7 @@ struct options_t
                 ("config-file,E", po::value<string>(), "config file")
                 ("addr2line,A",  po::value<fs::path>(&addr2line)->default_value("addr2line"), "Custom addr2line command")
                 ("source-dir,S", po::value<fs::path>(&source_dir), "root of the source directory")
-                ("log-file,L",   po::value<fs::path>(&log_file), "log file (instead of stderrr)")
+                ("log,L",   po::value<fs::path>(&log_file), "log file (instead of stderrr)")
                 ("ignore-exit-code", po::bool_switch(&ignore_exit_code), "ignore the exit code");
 
 

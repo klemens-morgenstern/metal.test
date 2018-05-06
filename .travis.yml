@@ -10,8 +10,7 @@ addons:
     - ubuntu-toolchain-r-test
     packages:
     - valgrind
-    - python3
-    - python3-yaml
+    - python-yaml
     - gcc-7
     - g++-7
     - gdb

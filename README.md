@@ -46,6 +46,12 @@ This means that it can be used with the same assertions
 
 The calltrace provides a way to assert a certain call sequence for functions. Combined with the `metal.runner` it can be used to log function calls and add profiling.
 
+
+## [metal.serial](https://github.com/klemens-morgenstern/metal.test/wiki/serial.introduction)
+
+The serial library provides a light-weight testing tool for environment that do not have a
+
+
 # Documentation
 
 The current master Documentation can be found in the [wiki](https://github.com/klemens-morgenstern/metal.test/wiki).

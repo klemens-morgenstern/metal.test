@@ -28,8 +28,14 @@ bin_output = subprocess.check_output([exe], stderr=subprocess.STDOUT)
 json_output  = None
 
 with tempfile.NamedTemporaryFile() as temp_json:
-    output = subprocess.check_output([serial, exe, source_dir, "--ignore-exit-code", "--metal-test-format", "json",
-                                       "--metal-test-sink", temp_json.name], input=bin_output, stderr=subprocess.STDOUT).decode().splitlines()
+    proc = subprocess.Popen([serial, exe, source_dir, "--ignore-exit-code", "--metal-test-format", "json",
+                                       "--metal-test-sink", temp_json.name], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+
+    proc.stdin.write(bin_output)
+    out, err = proc.communicate()
+    output = out.decode().splitlines()
+
+    assert proc.returncode == 0
 
     assert output[0].startswith("Initializing metal serial from")
     assert output[1] == "a 42 test-string 401867 str-foo"

@@ -29,8 +29,12 @@ bin_output = subprocess.check_output([exe], stderr=subprocess.STDOUT)
 
 json_output  = None
 
-output = subprocess.check_output([serial, exe, source_dir, "--metal-test-no-exit-code", "--metal-test-format", "json",
-                                  "--metal-test-sink", temp_file], input=bin_output, stderr=subprocess.STDOUT).decode().splitlines()
+proc = subprocess.Popen([serial, exe, source_dir, "--metal-test-no-exit-code", "--metal-test-format", "json",
+                                  "--metal-test-sink", temp_file], stdin=subprocess.PIPE,  stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+proc.stdin.write(bin_output)
+output = proc.communicate()[0].decode().splitlines()
+assert proc.returncode == 0
+
 assert output[0].startswith("Initializing metal serial from")
 assert output[1] == "a 42 12 test-string 401867 foo-str"
 
