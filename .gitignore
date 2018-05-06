@@ -33,3 +33,4 @@
 /doc/html
 /cmake-build-debug
 CTestCostData.txt
+*/Testing

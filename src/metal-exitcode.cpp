@@ -3,9 +3,6 @@
  * @date   12.10.2016
  * @author Klemens D. Morgenstern
  *
-
-
-
  */
 
 #include <metal/debug/break_point.hpp>

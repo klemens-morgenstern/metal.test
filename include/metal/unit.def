@@ -1,12 +1,12 @@
 /**
- * @file   metal/backend.def
+ * @file   metal/unit.def
  * @date   25.10.2016
  * @author Klemens D. Morgenstern
  *
-
  */
-#ifndef METAL_BACKEND_DEF_
-#define METAL_BACKEND_DEF_
+
+#ifndef METAL_UNIT_DEF_
+#define METAL_UNIT_DEF_
 
 typedef enum __metal_level_t
 {

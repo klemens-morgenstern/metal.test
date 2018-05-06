@@ -1,0 +1,189 @@
+/**
+ * @file   metal/serial.def
+ * @date   25.10.2016
+ * @author Klemens D. Morgenstern
+ *
+ */
+
+#ifndef METAL_SERIAL_DEF_
+#define METAL_SERIAL_DEF_
+
+#if defined(__cplusplus)
+#include <cstdint>
+#else
+#include <stdint.h>
+#endif
+
+void  write_metal_serial(char);
+
+#define _METAL_SERIAL_VERSION_STRING "__metal_serial_version_0"
+
+#define _METAL_SERIAL_WRITE_BYTE(value) \
+    write_metal_serial(1);              \
+    write_metal_serial(value);          \
+    write_metal_serial('\0');
+
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+
+#define _METAL_SERIAL_WRITE_INT(value)                      \
+    write_metal_serial(sizeof(value));                      \
+    for (unsigned int idx = 0u; idx < sizeof(value); idx++) \
+         write_metal_serial(value >> (idx << 3));           \
+     write_metal_serial('\0'); \
+
+#else
+
+#define _METAL_SERIAL_WRITE_INT(value)                      \
+    write_metal_serial(sizeof(value));                      \
+    for (unsigned int idx = sizeof(value) - 1; idx >= 0 ; idx++) \
+         write_metal_serial(value >> (idx << 3));           \
+     write_metal_serial('\0'); \
+
+#endif
+
+#define _METAL_SERIAL_WRITE_UINT(value) _METAL_SERIAL_WRITE_INT(value)
+
+#define _METAL_SERIAL_WRITE_STR(value)                 \
+    {                                                  \
+        unsigned int strlen = 0;                       \
+        while(value[strlen++] != '\0');                \
+        write_metal_serial(strlen-1);                  \
+        for (unsigned int idx = 0u; idx<strlen; idx++) \
+            write_metal_serial(idx[value]);            \
+    }                                                  \
+
+
+
+#define _METAL_SERIAL_WRITE_MEMORY(pointer, size)  \
+    write_metal_serial(size);                      \
+    for (unsigned int idx = 0u; idx < size; idx++) \
+        write_metal_serial(idx[(char*)pointer]);   \
+    write_metal_serial('\0');
+
+#if defined(__cplusplus)
+#define _METAL_SERIAL_WRITE_PTR(value) _METAL_SERIAL_WRITE_INT((std::uintptr_t)value)
+#else
+#define _METAL_SERIAL_WRITE_PTR(value) _METAL_SERIAL_WRITE_INT((uintptr_t)value)
+#endif
+
+#define __METAL_SERIAL_WRITE_LOCATION_IMPL(CNT) \
+    { \
+        asm("__metal_serial_" #CNT ":" ); \
+        extern const int __metal_serial_ ## CNT;   \
+        _METAL_SERIAL_WRITE_PTR(&__metal_serial_ ## CNT);  \
+    }
+
+#define __METAL_SERIAL_WRITE_LOCATION_IMPL2(CNT) __METAL_SERIAL_WRITE_LOCATION_IMPL(CNT)
+
+#define _METAL_SERIAL_WRITE_LOCATION() __METAL_SERIAL_WRITE_LOCATION_IMPL2(__COUNTER__)
+
+#define METAL_SERIAL_INIT()                                                         \
+    for (unsigned int idx = 0u; idx<(sizeof(_METAL_SERIAL_VERSION_STRING)-1); idx++)\
+        write_metal_serial(_METAL_SERIAL_VERSION_STRING[idx]);                      \
+    int metal_serial_init = 0b0110110001000011;                                     \
+    _METAL_SERIAL_WRITE_MEMORY(&metal_serial_init, sizeof(int));                    \
+    _METAL_SERIAL_WRITE_LOCATION();                                                 \
+
+//    _METAL_SERIAL_WRITE_BYTE('\0')
+
+#if !defined(METAL_OVERLOAD)
+    #define METAL_CONCAT_IMPL( x, y ) x##y
+    #define METAL_CONCAT( x, y ) METAL_CONCAT_IMPL( x, y )
+
+    #define METAL_STRINGIZE(x) METAL_STRINGIZE2(x)
+    #define METAL_STRINGIZE2(x) #x
+    #define METAL_LOCATION_STR() __FILE__ "(" METAL_STRINGIZE(__LINE__) ")"
+
+    #define __METAL_PP_NARG(...)  __METAL_PP_NARG_(__VA_ARGS__,__METAL_PP_RSEQ_N())
+    #define __METAL_PP_NARG_(...) __METAL_PP_ARG_N(__VA_ARGS__)
+    #define __METAL_PP_ARG_N(_1, _2, _3, _4, _5, _6, _7, _8, _9,_A, _B, _C, _D, _E, _F, N,...) N
+    #define __METAL_PP_RSEQ_N() F, E, D, C, B, A, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
+
+    #define METAL_OVERLOAD(Macro, Args...) METAL_CONCAT(Macro, __METAL_PP_NARG(Args)) (Args)
+#endif
+
+#define _METAL_SERIAL_PRINTF_IMPL_1(Format)
+#define _METAL_SERIAL_PRINTF_IMPL_2(Format, Arg)       _METAL_SERIAL_WRITE_##Arg
+#define _METAL_SERIAL_PRINTF_IMPL_3(Format, Arg, ...)  _METAL_SERIAL_WRITE_##Arg _METAL_SERIAL_PRINTF_IMPL_2(Format, __VA_ARGS__)
+#define _METAL_SERIAL_PRINTF_IMPL_4(Format, Arg, ...)  _METAL_SERIAL_WRITE_##Arg _METAL_SERIAL_PRINTF_IMPL_3(Format, __VA_ARGS__)
+#define _METAL_SERIAL_PRINTF_IMPL_5(Format, Arg, ...)  _METAL_SERIAL_WRITE_##Arg _METAL_SERIAL_PRINTF_IMPL_4(Format, __VA_ARGS__)
+#define _METAL_SERIAL_PRINTF_IMPL_6(Format, Arg, ...)  _METAL_SERIAL_WRITE_##Arg _METAL_SERIAL_PRINTF_IMPL_5(Format, __VA_ARGS__)
+#define _METAL_SERIAL_PRINTF_IMPL_7(Format, Arg, ...)  _METAL_SERIAL_WRITE_##Arg _METAL_SERIAL_PRINTF_IMPL_6(Format, __VA_ARGS__)
+#define _METAL_SERIAL_PRINTF_IMPL_8(Format, Arg, ...)  _METAL_SERIAL_WRITE_##Arg _METAL_SERIAL_PRINTF_IMPL_7(Format, __VA_ARGS__)
+#define _METAL_SERIAL_PRINTF_IMPL_9(Format, Arg, ...)  _METAL_SERIAL_WRITE_##Arg _METAL_SERIAL_PRINTF_IMPL_8(Format, __VA_ARGS__)
+#define _METAL_SERIAL_PRINTF_IMPL_10(Format, Arg, ...) _METAL_SERIAL_WRITE_##Arg _METAL_SERIAL_PRINTF_IMPL_9(Format, __VA_ARGS__)
+#define _METAL_SERIAL_PRINTF_IMPL_11(Format, Arg, ...) _METAL_SERIAL_WRITE_##Arg _METAL_SERIAL_PRINTF_IMPL_10(Format, __VA_ARGS__)
+#define _METAL_SERIAL_PRINTF_IMPL_12(Format, Arg, ...) _METAL_SERIAL_WRITE_##Arg _METAL_SERIAL_PRINTF_IMPL_11(Format, __VA_ARGS__)
+#define _METAL_SERIAL_PRINTF_IMPL_13(Format, Arg, ...) _METAL_SERIAL_WRITE_##Arg _METAL_SERIAL_PRINTF_IMPL_12(Format, __VA_ARGS__)
+#define _METAL_SERIAL_PRINTF_IMPL_14(Format, Arg, ...) _METAL_SERIAL_WRITE_##Arg _METAL_SERIAL_PRINTF_IMPL_13(Format, __VA_ARGS__)
+#define _METAL_SERIAL_PRINTF_IMPL_15(Format, Arg, ...) _METAL_SERIAL_WRITE_##Arg _METAL_SERIAL_PRINTF_IMPL_14(Format, __VA_ARGS__)
+#define _METAL_SERIAL_PRINTF_IMPL_16(Format, Arg, ...) _METAL_SERIAL_WRITE_##Arg _METAL_SERIAL_PRINTF_IMPL_15(Format, __VA_ARGS__)
+#define _METAL_SERIAL_PRINTF_IMPL_17(Format, Arg, ...) _METAL_SERIAL_WRITE_##Arg _METAL_SERIAL_PRINTF_IMPL_16(Format, __VA_ARGS__)
+#define _METAL_SERIAL_PRINTF_IMPL_19(Format, Arg, ...) _METAL_SERIAL_WRITE_##Arg _METAL_SERIAL_PRINTF_IMPL_17(Format, __VA_ARGS__)
+#define _METAL_SERIAL_PRINTF_IMPL_20(Format, Arg, ...) _METAL_SERIAL_WRITE_##Arg _METAL_SERIAL_PRINTF_IMPL_19(Format, __VA_ARGS__)
+#define _METAL_SERIAL_PRINTF_IMPL_21(Format, Arg, ...) _METAL_SERIAL_WRITE_##Arg _METAL_SERIAL_PRINTF_IMPL_20(Format, __VA_ARGS__)
+#define _METAL_SERIAL_PRINTF_IMPL_22(Format, Arg, ...) _METAL_SERIAL_WRITE_##Arg _METAL_SERIAL_PRINTF_IMPL_21(Format, __VA_ARGS__)
+#define _METAL_SERIAL_PRINTF_IMPL_23(Format, Arg, ...) _METAL_SERIAL_WRITE_##Arg _METAL_SERIAL_PRINTF_IMPL_22(Format, __VA_ARGS__)
+#define _METAL_SERIAL_PRINTF_IMPL_24(Format, Arg, ...) _METAL_SERIAL_WRITE_##Arg _METAL_SERIAL_PRINTF_IMPL_23(Format, __VA_ARGS__)
+#define _METAL_SERIAL_PRINTF_IMPL_25(Format, Arg, ...) _METAL_SERIAL_WRITE_##Arg _METAL_SERIAL_PRINTF_IMPL_24(Format, __VA_ARGS__)
+#define _METAL_SERIAL_PRINTF_IMPL_26(Format, Arg, ...) _METAL_SERIAL_WRITE_##Arg _METAL_SERIAL_PRINTF_IMPL_25(Format, __VA_ARGS__)
+#define _METAL_SERIAL_PRINTF_IMPL_27(Format, Arg, ...) _METAL_SERIAL_WRITE_##Arg _METAL_SERIAL_PRINTF_IMPL_26(Format, __VA_ARGS__)
+#define _METAL_SERIAL_PRINTF_IMPL_28(Format, Arg, ...) _METAL_SERIAL_WRITE_##Arg _METAL_SERIAL_PRINTF_IMPL_27(Format, __VA_ARGS__)
+#define _METAL_SERIAL_PRINTF_IMPL_29(Format, Arg, ...) _METAL_SERIAL_WRITE_##Arg _METAL_SERIAL_PRINTF_IMPL_28(Format, __VA_ARGS__)
+#define _METAL_SERIAL_PRINTF_IMPL_30(Format, Arg, ...) _METAL_SERIAL_WRITE_##Arg _METAL_SERIAL_PRINTF_IMPL_29(Format, __VA_ARGS__)
+#define _METAL_SERIAL_PRINTF_IMPL_31(Format, Arg, ...) _METAL_SERIAL_WRITE_##Arg _METAL_SERIAL_PRINTF_IMPL_30(Format, __VA_ARGS__)
+#define _METAL_SERIAL_PRINTF_IMPL_32(Format, Arg, ...) _METAL_SERIAL_WRITE_##Arg _METAL_SERIAL_PRINTF_IMPL_31(Format, __VA_ARGS__)
+
+#define METAL_SERIAL_PRINTF(...) _METAL_SERIAL_WRITE_LOCATION(); METAL_OVERLOAD(_METAL_SERIAL_PRINTF_IMPL_, __VA_ARGS__)
+
+#if defined(__cplusplus)
+
+#define METAL_SERIAL_ASSERT(Condition) _METAL_SERIAL_WRITE_LOCATION(); _METAL_SERIAL_WRITE_BYTE((bool)Condition);
+#define METAL_SERIAL_EXPECT(Condition) _METAL_SERIAL_WRITE_LOCATION(); _METAL_SERIAL_WRITE_BYTE((bool)Condition);
+
+#define METAL_SERIAL_ASSERT_MESSAGE(Condition, Message) _METAL_SERIAL_WRITE_LOCATION(); _METAL_SERIAL_WRITE_BYTE((bool)Condition);
+#define METAL_SERIAL_EXPECT_MESSAGE(Condition, Message) _METAL_SERIAL_WRITE_LOCATION(); _METAL_SERIAL_WRITE_BYTE((bool)Condition);
+
+#else
+
+#define METAL_SERIAL_ASSERT(Condition) _METAL_SERIAL_WRITE_LOCATION(); _METAL_SERIAL_WRITE_BYTE(Condition);
+#define METAL_SERIAL_EXPECT(Condition) _METAL_SERIAL_WRITE_LOCATION(); _METAL_SERIAL_WRITE_BYTE(Condition);
+
+#define METAL_SERIAL_ASSERT_MESSAGE(Condition, Message) _METAL_SERIAL_WRITE_LOCATION(); _METAL_SERIAL_WRITE_BYTE(Condition);
+#define METAL_SERIAL_EXPECT_MESSAGE(Condition, Message) _METAL_SERIAL_WRITE_LOCATION(); _METAL_SERIAL_WRITE_BYTE(Condition);
+
+#endif
+
+#define METAL_SERIAL_CALL_1(Function) _METAL_SERIAL_WRITE_LOCATION(); _METAL_SERIAL_WRITE_BYTE(1); Function(); \
+                                      _METAL_SERIAL_WRITE_LOCATION(); _METAL_SERIAL_WRITE_BYTE(0);
+
+#define METAL_SERIAL_CALL_2(Function, Description) METAL_SERIAL_CALL_1(Function)
+#define METAL_SERIAL_CALL(...) METAL_OVERLOAD(METAL_SERIAL_CALL_, __VA_ARGS__)
+
+#define METAL_SERIAL_CHECKPOINT() _METAL_SERIAL_WRITE_LOCATION()
+
+#define METAL_SERIAL_ASSERT_NO_EXECUTE() _METAL_SERIAL_WRITE_LOCATION()
+#define METAL_SERIAL_EXPECT_NO_EXECUTE() _METAL_SERIAL_WRITE_LOCATION()
+
+ #define METAL_SERIAL_ASSERT_EQUAL(Lhs, Rhs) _METAL_SERIAL_WRITE_LOCATION(); _METAL_SERIAL_WRITE_BYTE(Lhs == Rhs); _METAL_SERIAL_WRITE_INT(Lhs); _METAL_SERIAL_WRITE_INT(Rhs)
+#define METAL_SERIAL_EXPECT_EQUAL(Lhs, Rhs) _METAL_SERIAL_WRITE_LOCATION(); _METAL_SERIAL_WRITE_BYTE(Lhs == Rhs); _METAL_SERIAL_WRITE_INT(Lhs); _METAL_SERIAL_WRITE_INT(Rhs)
+
+#define METAL_SERIAL_ASSERT_NOT_EQUAL(Lhs, Rhs) _METAL_SERIAL_WRITE_LOCATION(); _METAL_SERIAL_WRITE_BYTE(Lhs != Rhs); _METAL_SERIAL_WRITE_INT(Lhs); _METAL_SERIAL_WRITE_INT(Rhs)
+#define METAL_SERIAL_EXPECT_NOT_EQUAL(Lhs, Rhs) _METAL_SERIAL_WRITE_LOCATION(); _METAL_SERIAL_WRITE_BYTE(Lhs != Rhs); _METAL_SERIAL_WRITE_INT(Lhs); _METAL_SERIAL_WRITE_INT(Rhs)
+
+#define METAL_SERIAL_ASSERT_GE(Lhs, Rhs) _METAL_SERIAL_WRITE_LOCATION(); _METAL_SERIAL_WRITE_BYTE(Lhs >= Rhs); _METAL_SERIAL_WRITE_INT(Lhs); _METAL_SERIAL_WRITE_INT(Rhs)
+#define METAL_SERIAL_EXPECT_GE(Lhs, Rhs) _METAL_SERIAL_WRITE_LOCATION(); _METAL_SERIAL_WRITE_BYTE(Lhs >= Rhs); _METAL_SERIAL_WRITE_INT(Lhs); _METAL_SERIAL_WRITE_INT(Rhs)
+
+#define METAL_SERIAL_ASSERT_LE(Lhs, Rhs) _METAL_SERIAL_WRITE_LOCATION(); _METAL_SERIAL_WRITE_BYTE(Lhs <= Rhs); _METAL_SERIAL_WRITE_INT(Lhs); _METAL_SERIAL_WRITE_INT(Rhs)
+#define METAL_SERIAL_EXPECT_LE(Lhs, Rhs) _METAL_SERIAL_WRITE_LOCATION(); _METAL_SERIAL_WRITE_BYTE(Lhs <= Rhs); _METAL_SERIAL_WRITE_INT(Lhs); _METAL_SERIAL_WRITE_INT(Rhs)
+
+#define METAL_SERIAL_ASSERT_GREATER(Lhs, Rhs) _METAL_SERIAL_WRITE_LOCATION(); _METAL_SERIAL_WRITE_BYTE(Lhs > Rhs); _METAL_SERIAL_WRITE_INT(Lhs); _METAL_SERIAL_WRITE_INT(Rhs)
+#define METAL_SERIAL_EXPECT_GREATER(Lhs, Rhs) _METAL_SERIAL_WRITE_LOCATION(); _METAL_SERIAL_WRITE_BYTE(Lhs > Rhs); _METAL_SERIAL_WRITE_INT(Lhs); _METAL_SERIAL_WRITE_INT(Rhs)
+
+#define METAL_SERIAL_ASSERT_LESSER(Lhs, Rhs) _METAL_SERIAL_WRITE_LOCATION(); _METAL_SERIAL_WRITE_BYTE(Lhs < Rhs); _METAL_SERIAL_WRITE_INT(Lhs); _METAL_SERIAL_WRITE_INT(Rhs)
+#define METAL_SERIAL_EXPECT_LESSER(Lhs, Rhs) _METAL_SERIAL_WRITE_LOCATION(); _METAL_SERIAL_WRITE_BYTE(Lhs < Rhs); _METAL_SERIAL_WRITE_INT(Lhs); _METAL_SERIAL_WRITE_INT(Rhs)
+
+#define METAL_SERIAL_EXIT(Value) _METAL_SERIAL_WRITE_LOCATION(); _METAL_SERIAL_WRITE_INT(Value);
+#define METAL_SERIAL_TEST_EXIT() _METAL_SERIAL_WRITE_LOCATION();
+
+#endif

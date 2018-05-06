@@ -1,0 +1,25 @@
+test/serial/compile_test.c:30
+a 42 test-string str-foo
+test/serial/compile_test.c(51) assertion succeeded [expression]: condition
+test/serial/compile_test.c(52) expectation succeeded [expression]: condition
+test/serial/compile_test.c(54) assertion succeeded [message]: "Some Message"
+test/serial/compile_test.c(55) expectation succeeded [message]: "Some other message"
+test/serial/compile_test.c(57) entering test case [test_func]
+test/serial/compile_test.c(13) expectation failed do not execute.
+test/serial/compile_test.c(14) checkpoint
+test/serial/compile_test.c(15) assertion failed do not execute.
+test/serial/compile_test.c(16) assertion failed [equality]: ; [21 == 2]
+test/serial/compile_test.c(17) expectation failed do not execute.
+test/serial/compile_test.c(18) expectation succeeded [equality]: ; [12 == 12]
+test/serial/compile_test.c(57) exiting test case [test_func]: { executed : 5, warnings : 2, errors : 2}
+test/serial/compile_test.c(59) assertion succeeded [equality]: 12 != 42; [12 != i]
+test/serial/compile_test.c(60) expectation succeeded [equality]: 32 != 42; [32 != i]
+test/serial/compile_test.c(62) assertion failed [comparison]: 23 >= 42; [23 >= i]
+test/serial/compile_test.c(63) expectation failed [comparison]: 12 >= 42; [12 >= i]
+test/serial/compile_test.c(65) assertion failed [comparison]: 43 <= 11; [i++ <= 11]
+test/serial/compile_test.c(66) expectation succeeded [comparison]: 23 <= 49; [23 <= ++i]
+test/serial/compile_test.c(68) assertion succeeded [comparison]: 52 > 12; [i > 12]
+test/serial/compile_test.c(69) expectation succeeded [comparison]: 52 > 32; [i > 32]
+test/serial/compile_test.c(71) assertion succeeded [comparison]: 53 < 92; [i++ < 92]
+test/serial/compile_test.c(72) expectation failed [comparison]: 59 < 12; [++i < 12]
+Exiting serial execution with 42

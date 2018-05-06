@@ -746,7 +746,7 @@ void metal_dbg_setup_options(boost::program_options::options_description & op)
 {
     namespace po = boost::program_options;
     op.add_options()
-                   ("metal-test-no-exit-code", po::bool_switch(&no_exit_code), "config file")
+                   ("metal-test-no-exit-code", po::bool_switch(&no_exit_code), "disable exit-code")
                    ("metal-test-sink",         po::value<string>(&sink_file),  "test data sink")
                    ("metal-test-format",       po::value<string>(&format),     "format [hrf, json]")
                    ;

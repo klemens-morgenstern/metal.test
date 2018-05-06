@@ -1,5 +1,5 @@
 /**
- * @file   metal/test/backend.hpp
+ * @file   metal/test/unit.hpp
  * @date   29.07.2016
  * @author Klemens D. Morgenstern
  *
