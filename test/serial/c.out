@@ -1,5 +1,5 @@
 test/serial/compile_test.c:30
-a 42 test-string 401867 str-foo
+a 42 test-string str-foo
 test/serial/compile_test.c(51) assertion succeeded [expression]: condition
 test/serial/compile_test.c(52) expectation succeeded [expression]: condition
 test/serial/compile_test.c(54) assertion succeeded [message]: "Some Message"

@@ -42,12 +42,11 @@ int main(int argc, char ** argv)
         _METAL_SERIAL_WRITE_MEMORY(&i, sizeof(i));
     }
     const char cstr[] = "foo-str";
-    METAL_SERIAL_PRINTF("%i %i %d %s %p %s",
+    METAL_SERIAL_PRINTF("%c %d %d %s %s",
                         BYTE('a'),
                         INT(42),
                         UINT(12),
                         STR("test-string"),
-                        PTR(&main),
                         MEMORY(cstr, 7));
 
     bool condition = true;

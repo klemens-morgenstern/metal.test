@@ -1,5 +1,5 @@
 test/serial/compile_test.cpp:33
-a 42 12 test-string 401867 foo-str
+a 42 12 test-string foo-str
 test/serial/compile_test.cpp(55) assertion succeeded [expression]: condition
 test/serial/compile_test.cpp(56) expectation succeeded [expression]: true
 test/serial/compile_test.cpp(58) assertion succeeded [message]: "Some message"

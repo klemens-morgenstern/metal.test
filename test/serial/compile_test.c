@@ -39,11 +39,10 @@ int main(int argc, char ** args)
         _METAL_SERIAL_WRITE_MEMORY(&i, sizeof(i));
     }
     const char * cstr = "str-foo";
-    METAL_SERIAL_PRINTF("%i %i %s %p %i",
+    METAL_SERIAL_PRINTF("%i %i %s %s",
                         BYTE('a'),
                         INT(42),
                         STR("test-string"),
-                        PTR(&main),
                         MEMORY(cstr, 7));
 
     int condition = 42;
