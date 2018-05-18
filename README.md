@@ -1,4 +1,4 @@
-[![status](https://travis-ci.org/klemens-morgenstern/metal.test.svg?branch=master)](https://travis-ci.org/klemens-morgenstern/metal.test) [![Build status](https://ci.appveyor.com/api/projects/status/abix4vrfnde2xmnm?svg=true)](https://ci.appveyor.com/project/klemens-morgenstern/metal-test) ![stable](https://img.shields.io/badge/stability-stable_beta-green.svg) [![Issues](https://img.shields.io/github/issues/klemens-morgenstern/metal.test.svg)](https://github.com/klemens-morgenstern/metal.test/issues)
+[![status](https://travis-ci.org/klemens-morgenstern/metal.test.svg?branch=master)](https://travis-ci.org/klemens-morgenstern/metal.test) ![stable](https://img.shields.io/badge/stability-stable_beta-green.svg) [![Issues](https://img.shields.io/github/issues/klemens-morgenstern/metal.test.svg)](https://github.com/klemens-morgenstern/metal.test/issues)
 
 # About
 
