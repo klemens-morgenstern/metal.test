@@ -1,5 +1,7 @@
 project(metal.test)
 cmake_minimum_required(VERSION 3.9)
+
+set(BOOST_ROOT C:\\develop\\boost\\boost_1_64_0)
 set(CMAKE_CXX_STANDARD 14)
 set(RAPIDJSON_BUILD_CXX11 ON)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS  TRUE)
@@ -101,11 +103,8 @@ add_library(metal::unit ALIAS unit)
 add_library(metal::calltrace ALIAS calltrace)
 add_executable(metal::runner ALIAS runner)
 
-option(BUILD_METAL_TEST_TESTS "Build the metal.test tests" FALSE)
-if(BUILD_METAL_TEST_TESTS)
-    add_subdirectory(test)
-endif()
+add_subdirectory(test)
 
-option(BUILD_METAL_TEST_EXAMPLES "Build the metal.test examples" FALSE)
+option(BUILD_METAL_TEST_EXAMPLES "Build the metal.test examples" TRUE)
 if (BUILD_METAL_TEST_EXAMPLES)
 endif()
