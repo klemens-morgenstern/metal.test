@@ -1,7 +1,6 @@
 project(metal.test)
 cmake_minimum_required(VERSION 3.9)
 
-set(BOOST_ROOT C:\\develop\\boost\\boost_1_64_0)
 set(CMAKE_CXX_STANDARD 14)
 set(RAPIDJSON_BUILD_CXX11 ON)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS  TRUE)
