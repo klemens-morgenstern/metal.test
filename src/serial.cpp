@@ -11,15 +11,14 @@
 #include <vector>
 #include <regex>
 #include <boost/program_options.hpp>
-#include <boost/filesystem.hpp>
-
+#include <filesystem>
 #include <boost/dll.hpp>
 #include <boost/tokenizer.hpp>
 #include <memory>
 #include <iterator>
 
 #include <boost/algorithm/string/case_conv.hpp>
-#include <boost/optional.hpp>
+#include <optional>
 
 #include <boost/spirit/home/x3.hpp>
 #include <boost/spirit/home/x3/binary/binary.hpp>
@@ -28,18 +27,20 @@
 
 #include <boost/algorithm/string/trim_all.hpp>
 
+#include "serial/python_module.hpp"
 #include "serial/implementation.hpp"
 #include "serial/core_functions.hpp"
 #include "serial/test_functions.hpp"
 
 #if defined(BOOST_WINDOWS_API)
 #include <fcntl.h>
+#include <io.h>
 #else
 #include <ext/stdio_filebuf.h>
 #endif
 
 namespace po = boost::program_options;
-namespace fs = boost::filesystem;
+namespace fs = std::filesystem;
 namespace x3 = boost::spirit::x3;
 using namespace metal::serial;
 using namespace std;
@@ -68,8 +69,10 @@ struct options_t
     bool ignore_exit_code = false;
 
     vector<fs::path> dlls;
-
     vector<boost::dll::shared_library> plugins;
+
+    vector<fs::path> pys;
+    vector<python_module> py_mods;
 
     string source_folder;
 
@@ -123,7 +126,8 @@ struct options_t
         using namespace boost::program_options;
 
         desc.add_options()
-                ("lib,P",         value<vector<fs::path>>(&dlls)->multitoken(), "break-point libraries")
+                ("lib,B",         value<vector<fs::path>>(&dlls)->multitoken(), "break-point libraries")
+                ("py,P",          value<vector<fs::path>>(&pys)->multitoken(), "python libraries")
                 ("response-file", value<string>(), "can be specified with '@name', too")
                 ("config-file,C", value<string>(), "config file")
                 ;
@@ -140,17 +144,17 @@ struct options_t
         for (auto & dll : dlls)
         {
             if (fs::exists(dll))
-                plugins.emplace_back(dll);
+                plugins.emplace_back(dll.string());
             else if (dll.parent_path().empty())
             {
                 //check for the local version needed
 #if defined(BOOST_WINDOWS_API)
-                fs::path p = my_path / ("lib" + dll.string() + ".dll");
+                    fs::path p = my_path / ("lib" + dll.string() + ".dll");
 #else
                 fs::path p = my_path / ("lib" + dll.string() + ".so");
 #endif
                 if (fs::exists(p))
-                    plugins.emplace_back(p);
+                    plugins.emplace_back(p.string());
                 else
                     continue;
             }
@@ -165,14 +169,20 @@ struct options_t
                 f(po);
                 desc.add(std::move(po));
             }
+        }
 
+
+        for (auto & py : pys)
+        {
+            py_mods.emplace_back(py, my_path);
+            py_mods.back().load(desc);
         }
 
         //ok, now load the full thingy
         vm.clear();
 
         desc.add_options()
-                ("help,H", "produce help message")
+                ("help,H",  po::bool_switch(&help), "produce help message")
                 ("binary,B", po::value<string>(&binary), "binary")
                 ("compiler,C", po::value<string>(&comp), "compiler [gcc, clang]")
                 ("response-file", po::value<string>(), "can be specified with '@name', too")
@@ -191,9 +201,9 @@ struct options_t
                 options(desc).positional(pos).extra_parser(at_option_parser).run(), vm);
 
         load_cfg();
-
         po::notify(vm);
     }
+
 };
 
 int main(int argc, char **argv)
@@ -213,14 +223,14 @@ int main(int argc, char **argv)
             return 2;
         }
 
-        boost::optional<fs::ofstream> logstream;
+        std::optional<std::ofstream> logstream;
         if (!opt.log_file.empty())
         {
             logstream.emplace(opt.log_file);
             std::cerr.rdbuf(logstream->rdbuf());
         }
 
-        boost::optional<fs::ifstream> fstream;
+        std::optional<std::ifstream> fstream;
         if (!opt.input.empty())
             fstream.emplace(opt.input, std::fstream::in | std::fstream::binary);
 
@@ -250,8 +260,16 @@ int main(int argc, char **argv)
             auto f = boost::dll::import<void(std::unordered_map<std::string, metal::serial::plugin_function_t> &)>(lib, "metal_serial_setup_entries");
             f(macros);
         }
+
+        for (auto & py_mod : opt.py_mods)
+        {
+            const auto new_macros = py_mod.load_macros();
+            macros.insert(new_macros.begin(), new_macros.end());
+        }
+
         macros.emplace("METAL_SERIAL_PRINTF", printf_impl);
         macros.emplace("METAL_SERIAL_EXIT",   exit_impl);
+
         return run_serial(opt.binary, opt.source_dir, opt.addr2line, itr, end, nullchar, intLength,
                           ptrLength, macros, init_loc, endianess, opt.ignore_exit_code);
     }

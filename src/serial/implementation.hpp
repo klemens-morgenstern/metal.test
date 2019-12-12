@@ -10,18 +10,18 @@
 
 #include <metal/serial/session.hpp>
 #include <iterator>
-#include <boost/filesystem/path.hpp>
+#include <filesystem>
 #include <boost/spirit/home/support/multi_pass.hpp>
 #include <boost/optional.hpp>
 #include <boost/functional/hash.hpp>
 
 namespace std
 {
-template<> struct hash<boost::filesystem::path>
+template<> struct hash<std::filesystem::path>
 {
-    size_t operator()(const boost::filesystem::path& p) const
+    size_t operator()(const std::filesystem::path& p) const
     {
-        return boost::filesystem::hash_value(p);
+        return std::filesystem::hash_value(p);
     }
 };
 }
@@ -32,7 +32,7 @@ struct parser_exception : std::runtime_error {using std::runtime_error::runtime_
 bool init_session(iterator_t & itr, const iterator_t & end, char & nullchar,
                   int & intLength, int & ptrLength, metal::serial::endianess_t &endianess, std::uint64_t &init_loc);
 
-int run_serial(const std::string binary, const boost::filesystem::path &source_dir, const boost::filesystem::path addr2line,
+int run_serial(const std::string binary, const std::filesystem::path &source_dir, const std::filesystem::path &addr2line,
                iterator_t &itr, const iterator_t &end, char nullchar, int intLength, int ptrLength,
                const std::unordered_map<std::string, metal::serial::plugin_function_t> &macros, std::uint64_t init_loc,
                metal::serial::endianess_t endianess, bool ignore_exit_code);

@@ -11,7 +11,7 @@
 #include <boost/process/pipe.hpp>
 #include <boost/process/io.hpp>
 #include <boost/process/child.hpp>
-#include <metal/serial.hpp>
+
 #include <boost/process/search_path.hpp>
 #include <iostream>
 #include <boost/algorithm/string/trim_all.hpp>
@@ -20,9 +20,11 @@
 #include <fstream>
 #include <regex>
 
+#define _METAL_SERIAL_VERSION_STRING "__metal_serial_version_0"
+
 namespace bp = boost::process;
 
-namespace fs = boost::filesystem;
+namespace fs = std::filesystem;
 namespace x3 = boost::spirit::x3;
 using namespace metal::serial;
 using namespace std;
@@ -154,19 +156,20 @@ struct loaded_file
 };
 
 
-
-int run_serial(const std::string binary, const boost::filesystem::path &source_dir, const boost::filesystem::path addr2line,
+int run_serial(const std::string binary, const std::filesystem::path &source_dir, const std::filesystem::path &addr2line,
                iterator_t &itr, const iterator_t &end, char nullchar, int intLength, int ptrLength,
                const std::unordered_map<std::string, metal::serial::plugin_function_t> &macros, std::uint64_t init_loc,
-               endianess_t endianess, bool ignore_exit_code)
+               metal::serial::endianess_t endianess, bool ignore_exit_code)
 {
     bp::ipstream pin;
     bp::opstream pout;
-    bp::child ch(bp::search_path(addr2line), "--exe=" + binary, bp::std_in < pout, bp::std_out > pin,
+    bp::child ch(bp::search_path(addr2line.string()), "--exe=" + binary, bp::std_in < pout, bp::std_out > pin,
                  bp::std_err > stderr);
 
+    ch.wait_for(std::chrono::milliseconds(100));
+
     if (!ch.running()) {
-        std::cerr << "addr2line not started (" << bp::search_path(addr2line) << ")" << std::endl;
+        std::cerr << "addr2line not started (" << bp::search_path(addr2line.string()) << ")" << std::endl;
         return 2;
     }
     else
@@ -188,7 +191,7 @@ int run_serial(const std::string binary, const boost::filesystem::path &source_d
 
         string line;
         vector<string> st; st.push_back("/** INVALID LINE **/"); //to start at one
-        fs::ifstream istr(pth);
+        std::ifstream istr(pth);
         ostringstream str;
         str << istr.rdbuf();
 
