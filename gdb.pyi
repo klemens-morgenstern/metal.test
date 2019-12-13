@@ -301,12 +301,12 @@ COMMAND_OBSCURE : __command_class
 COMMAND_MAINTENANCE : __command_class
 
 class __complete_class: ...
-COMPLETE_NONE = __complete_class
-COMPLETE_FILENAME = __complete_class
-COMPLETE_LOCATION = __complete_class
-COMPLETE_COMMAND = __complete_class
-COMPLETE_SYMBOL = __complete_class
-COMPLETE_EXPRESSION = __complete_class
+COMPLETE_NONE : __complete_class
+COMPLETE_FILENAME : __complete_class
+COMPLETE_LOCATION : __complete_class
+COMPLETE_COMMAND : __complete_class
+COMPLETE_SYMBOL : __complete_class
+COMPLETE_EXPRESSION : __complete_class
 
 
 class Parameter:
@@ -320,18 +320,18 @@ class Parameter:
 
 class __parameter_class: pass
 
-PARAM_BOOLEAN = __parameter_class
-PARAM_AUTO_BOOLEAN = __parameter_class
-PARAM_UINTEGER = __parameter_class
-PARAM_INTEGER = __parameter_class
-PARAM_STRING = __parameter_class
-PARAM_STRING_NOESCAPE = __parameter_class
-PARAM_OPTIONAL_FILENAME = __parameter_class
-PARAM_FILENAME = __parameter_class
-PARAM_ZINTEGER = __parameter_class
-PARAM_ZUINTEGER = __parameter_class
-PARAM_ZUINTEGER_UNLIMITED = __parameter_class
-PARAM_ENUM = __parameter_class
+PARAM_BOOLEAN : __parameter_class
+PARAM_AUTO_BOOLEAN : __parameter_class
+PARAM_UINTEGER : __parameter_class
+PARAM_INTEGER : __parameter_class
+PARAM_STRING : __parameter_class
+PARAM_STRING_NOESCAPE : __parameter_class
+PARAM_OPTIONAL_FILENAME : __parameter_class
+PARAM_FILENAME : __parameter_class
+PARAM_ZINTEGER : __parameter_class
+PARAM_ZUINTEGER : __parameter_class
+PARAM_ZUINTEGER_UNLIMITED : __parameter_class
+PARAM_ENUM : __parameter_class
 
 class Function:
     def __init__(self, name: str): ...
