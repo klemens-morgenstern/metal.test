@@ -688,7 +688,7 @@ struct metal_test_backend : break_point
     {
         auto oper = fr.arg_list(1).value;
 
-        if (oper == "__metal_oper_enter_case"        ) session.enter_case   (fr);
+        if      (oper == "__metal_oper_enter_case"   ) session.enter_case   (fr);
         else if (oper == "__metal_oper_exit_case"    ) session.exit_case    (fr);
         else if (oper == "__metal_oper_enter_ranged" ) session.enter_ranged (fr);
         else if (oper == "__metal_oper_exit_ranged"  ) session.exit_ranged  (fr);
