@@ -10,13 +10,13 @@ function(gdb_run source compare ret-code)
         set_tests_properties(test_${source_stem} PROPERTIES WILL_FAIL TRUE)
     endif()
 
-    add_test(NAME test_${source_stem}_gdb
-             COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/gdb-run.py --root=${CMAKE_CURRENT_SOURCE_DIR}
-             --compare=${compare} --exe=$<TARGET_FILE:${source_stem}_test_exe>
-             --runner=$<TARGET_FILE:runner> --unit=$<TARGET_FILE:unit>
-            --return_code=${ret-code}
-            ${opts}
-            WORKING_DIRECTORY  ${CMAKE_CURRENT_SOURCE_DIR})
+#    add_test(NAME test_${source_stem}_gdb
+#             COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/gdb-run.py --root=${CMAKE_CURRENT_SOURCE_DIR}
+#             --compare=${compare} --exe=$<TARGET_FILE:${source_stem}_test_exe>
+#             --runner=$<TARGET_FILE:runner> --unit=$<TARGET_FILE:unit>
+#            --return_code=${ret-code}
+#            ${opts}
+#            WORKING_DIRECTORY  ${CMAKE_CURRENT_SOURCE_DIR})
 endfunction(gdb_run)
 
 gdb_run(empty_test.cpp    empty_test.out   0)

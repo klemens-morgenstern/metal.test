@@ -10,8 +10,8 @@ target_link_libraries(test_c   calltrace-impl)
 set_target_properties(test_cpp PROPERTIES COMPILE_FLAGS "-finstrument-functions -g -gdwarf-2")
 set_target_properties(test_c   PROPERTIES COMPILE_FLAGS "-finstrument-functions -g -gdwarf-2")
 
-add_test(NAME test_cpp COMMAND test_cpp)
-add_test(NAME test_c   COMMAND test_c)
+add_test(NAME test_cpp COMMAND $<TARGET_FILE:test_cpp>)
+add_test(NAME test_c   COMMAND $<TARGET_FILE:test_c>)
 
 add_library(plugin-test-o    STATIC plugin-test.cpp)
 add_library(plugin-test-ts-o STATIC plugin-test.cpp)
@@ -35,8 +35,8 @@ add_test(NAME plugin-test-ts COMMAND plugin-test-ts)
 add_test(NAME test_plugin
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test-plugin.py
         --root=${CMAKE_CURRENT_SOURCE_DIR}
-        --runner=$<TARGET_FILE:runner>
-        --calltrace=$<TARGET_FILE:calltrace>
+        --proj_root=${CMAKE_SOURCE_DIR}
+        --gdbinit=${CMAKE_CURRENT_SOURCE_DIR}/gdbinit
         --hrf_cmp_ts=${CMAKE_CURRENT_SOURCE_DIR}/hrf-cmp-ts.txt
         --hrf_cmp=${CMAKE_CURRENT_SOURCE_DIR}/hrf-cmp.txt
         --plugin_test=$<TARGET_FILE:plugin-test>

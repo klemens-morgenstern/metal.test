@@ -1,7 +1,6 @@
 import re
 import sys
 import json
-from typing import List
 
 import gdb
 
@@ -139,10 +138,8 @@ class SelectJsonSink(gdb.Parameter):
 
 selectJsonSink = SelectJsonSink()
 
-from enum import Enum
 
-
-class Level(Enum):
+class Level:
     assertion = 0
     expect = 1
 
@@ -152,7 +149,7 @@ def descr(lvl):
     elif lvl == Level.expect : return "expectation"
     else: return ""
 
-def str_arg(args: List[gdb.Symbol], frame, idx): return str(args[idx + 4].value(frame).string())
+def str_arg(args, frame, idx): return str(args[idx + 4].value(frame).string())
 
 
 def level(args, frame):
@@ -248,7 +245,10 @@ class metal_test_backend(gdb.Breakpoint):
         oper = str(args[1].value(fr))[len("__metal_oper_"):]
 
         try:
-            getattr(self, oper)(args, fr)
+            if oper == "exec":
+                self.exec_(args, fr)
+            else:
+                getattr(self, oper)(args, fr)
         except Exception as e:
             gdb.write("Internal error {}\n".format(e), gdb.STDERR)
 
@@ -595,7 +595,7 @@ class metal_test_backend(gdb.Breakpoint):
         ck["type"] = "no_execute_check"
         current_scope.tests.append(ck)
 
-    def exec(self, args, frame):
+    def exec_(self, args, frame):
         ck, prefix, current_scope = self.__check(args, frame)
         gdb.write("{} do execute.\n".format(prefix))
         ck["type"] = "execute_check"

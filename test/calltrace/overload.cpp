@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(fn_test)
     BOOST_CHECK(test(mem_fn_v<>(&foo::b)));
     BOOST_CHECK(test(mem_fn_cv<>(&foo::b)));
 
-#if __GNUC__ >= 8
+#if __GNUC__ >= 10
     //disable because this is bug in GCC
     BOOST_CHECK(test(mem_fn_lvalue<>(&foo::c)));
     BOOST_CHECK(test(mem_fn_c_lvalue<>(&foo::c)));

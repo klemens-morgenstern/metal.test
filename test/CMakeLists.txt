@@ -15,5 +15,4 @@ SET( CMAKE_BUILD_TYPE Debug ... FORCE )
 
 add_subdirectory(unit)
 add_subdirectory(calltrace)
-add_subdirectory(runner)
 add_subdirectory(serial)

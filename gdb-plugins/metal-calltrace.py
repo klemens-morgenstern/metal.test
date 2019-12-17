@@ -58,7 +58,7 @@ log_all = TraceAll()
 
 class Profile(gdb.Parameter):
     def __init__(self):
-        super(TraceAll, self).__init__("metal-calltrace-timestamp",
+        super(Profile, self).__init__("metal-calltrace-timestamp",
                                        gdb.COMMAND_DATA,
                                        gdb.PARAM_BOOLEAN)
         self.value = True
@@ -72,7 +72,7 @@ profile = Profile()
 
 class Minimal(gdb.Parameter):
     def __init__(self):
-        super(TraceAll, self).__init__("metal-calltrace-minimal",
+        super(Minimal, self).__init__("metal-calltrace-minimal",
                                        gdb.COMMAND_DATA,
                                        gdb.PARAM_BOOLEAN)
         self.value = True
@@ -86,7 +86,7 @@ minimal = Minimal()
 
 class Depth(gdb.Parameter):
     def __init__(self):
-        super(TraceAll, self).__init__("metal-calltrace-depth",
+        super(Depth, self).__init__("metal-calltrace-depth",
                                        gdb.COMMAND_DATA,
                                        gdb.PARAM_INTEGER)
         self.value = 3
@@ -321,7 +321,6 @@ class metal_calltrace(gdb.Breakpoint):
         depth = str(gdb.parse_and_eval("__metal_calltrace_depth"))
 
         for ct in self.cts:
-            ct: calltrace_clone
             if ct.my_depth(depth):
                 pos = ct.current_position
                 if ct.stop():
@@ -373,7 +372,6 @@ class metal_calltrace(gdb.Breakpoint):
             "function" : str(val.block.function),
             "file": val.block.function.symtab.filename,
             "line" : gdb.find_pc_line(val.address).line}
-                    
         js = {
             "mode":"set",
             "calltrace": {

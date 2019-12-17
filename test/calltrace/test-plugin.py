@@ -7,21 +7,21 @@ parser.add_argument('--root', metavar='R', type=str, # nargs='+',
                     help='an integer for the accumulator')
 
 
-parser.add_argument('--calltrace')
 parser.add_argument('--hrf_cmp_ts')
-parser.add_argument('--runner')
+parser.add_argument('--gdbinit')
 parser.add_argument('--hrf_cmp')
 parser.add_argument('--plugin_test')
 parser.add_argument('--plugin_test_ts')
+parser.add_argument('--proj_root')
 
 args = parser.parse_args()
 
 plugin_test     = args.plugin_test
 plugin_test_ts  = args.plugin_test_ts
-runner          = args.runner
-calltrace       = args.calltrace
+gdbinit         = args.gdbinit
 hrf_cmp_file    = args.hrf_cmp
 hrf_cmp_ts_file = args.hrf_cmp_ts
+proj_root = args.proj_root
 
 import subprocess
 
@@ -29,19 +29,30 @@ cwd = os.getcwd();
 
 root = os.path.normpath(str(args.root))
 
-print ("FILE      : " + os.path.realpath(__file__))
-print ("PWD       : " + os.getcwd())
-print ("CT        : " + calltrace)
-print ("RN        : " + runner)
-print ("Plugin-Ts : " + plugin_test_ts)
-print ("Plugin    : " + plugin_test)
-print ("HRF-CMP   : " + hrf_cmp_file)
-print ("HRF-CMP-ts: " + hrf_cmp_ts_file)
+print("FILE      : " + os.path.realpath(__file__))
+print("PWD       : " + os.getcwd())
+print("GDBINIT   : " + gdbinit)
+print("Plugin-Ts : " + plugin_test_ts)
+print("Plugin    : " + plugin_test)
+print("HRF-CMP   : " + hrf_cmp_file)
+print("HRF-CMP-ts: " + hrf_cmp_ts_file)
 
 errored = False
 
-plugin_test_ts_out = subprocess.check_output([runner, "--exe", plugin_test_ts, "--lib", calltrace, "--metal-calltrace-timestamp"]).decode()
-plugin_test_out    = subprocess.check_output([runner, "--exe", plugin_test,    "--lib", calltrace, "--metal-calltrace-timestamp"]).decode()
+with open(gdbinit, "w") as f:
+    f.write('''source {}/gdb-plugins/metal-exitcode.py
+source {}/gdb-plugins/metal-calltrace.py
+
+set print elements 0
+set print repeats 0
+set metal-calltrace-timestamp on
+r
+'''.format(proj_root, proj_root))
+    gdbinit_name = f.name
+
+
+plugin_test_out    = subprocess.check_output(["gdb", plugin_test, "-x", gdbinit]).decode()
+plugin_test_ts_out = subprocess.check_output(["gdb", plugin_test_ts, "-x", gdbinit]).decode()
 
 
 import re
