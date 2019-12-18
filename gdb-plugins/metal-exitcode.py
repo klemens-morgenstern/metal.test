@@ -15,11 +15,12 @@ class exit_stub(gdb.Breakpoint):
         frame = gdb.selected_frame()
         args = [arg for arg in frame.block() if arg.is_argument]
 
+        exit_code = None
         for arg in args:
-            exit_code = arg.value(frame)
+            exit_code = str(arg.value(frame))
             break
 
-        gdb.post_event(lambda : self.exit(exit_code))
+        gdb.post_event(lambda: self.exit(exit_code))
 
 
     def exit(self, exit_code):
