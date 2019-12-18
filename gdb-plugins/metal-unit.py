@@ -22,10 +22,7 @@ class statistic:
         return self
 
     def cancel(self, args, frame, report):
-        gdb.post_event(lambda: self._cancel(args, frame, report))
-
-    def _cancel(self, args, frame, report):
-        gdb.execute("set  var __metal_critical = 0")
+        gdb.execute("set var __metal_critical = 0")
         fr = frame
 
         if fr.function().name == "main":

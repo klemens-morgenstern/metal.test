@@ -38,7 +38,8 @@ class Timeout(gdb.Parameter):
         if self.gdb_exited or self.timeout is None:
             return
         if self.gdb_running:
-            gdb.post_event(self.interrupt())
+            self.i_am_interrupting = True
+            gdb.post_event(self.interrupt)
         else:
             gdb.post_event(self.quit)
 
