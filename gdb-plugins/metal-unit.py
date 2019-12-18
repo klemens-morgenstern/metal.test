@@ -22,6 +22,9 @@ class statistic:
         return self
 
     def cancel(self, args, frame, report):
+        gdb.post_event(lambda: self._cancel(args, frame, report))
+
+    def _cancel(self, args, frame, report):
         gdb.execute("set  var __metal_critical = 0")
         fr = frame
 
@@ -258,7 +261,7 @@ class metal_test_backend(gdb.Breakpoint):
         id = str_arg(args, frame, 0)
         self.case = case(id)
         self.current_scope.children.append(self.case)
-        print("XYZ", self.case, self.current_scope)
+
         self.case.parent = self.current_scope
         self.current_scope = self.case
 

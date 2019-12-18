@@ -23,6 +23,7 @@ class exit_stub(gdb.Breakpoint):
     def exit(self, exit_code):
         sys.stdout.write("***metal-newlib*** Log: Invoking _exit with {}\n".format(exit_code))
         gdb.execute("set confirm off")
+
         gdb.execute("quit {}".format(exit_code))
 
 
@@ -31,7 +32,7 @@ _exit = exit_stub()
 
 def exit_event(event):
     if hasattr(event, 'exit_code') and exit_code:
-        gdb.execute("quit {}".format(exit_code))
+        gdb.post_event(lambda : gdb.execute("quit {}".format(exit_code)))
 
 
 gdb.events.exited.connect(exit_event)
