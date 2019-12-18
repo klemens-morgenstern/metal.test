@@ -67,7 +67,7 @@ class Timeout(gdb.Parameter):
 def wrap(func, ev):
     try: func(ev)
     except gdb.error as e:
-        gdb.write("Error in metal-timeout.py: {}".format(e))
+        gdb.write("Error in metal-timeout.py: {}".format(e), gdb.STDERR)
         traceback.print_exc()
         raise e
 

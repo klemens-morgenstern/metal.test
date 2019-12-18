@@ -1,6 +1,7 @@
 import re
 import sys
 import json
+import traceback
 
 import gdb
 
@@ -252,10 +253,12 @@ class metal_test_backend(gdb.Breakpoint):
                     getattr(self, oper)(args, fr)
             except Exception as e:
                 gdb.write("Internal error {}\n".format(e), gdb.STDERR)
+                raise e
 
             gdb.post_event(lambda: gdb.execute("continue"))
         except gdb.error as e:
-            gdb.write("Error in metal-unit.py: {}".format(e))
+            gdb.write("Error in metal-unit.py: {}".format(e), gdb.STDERR)
+            traceback.print_exc()
             raise e
 
     def enter_case(self, args, frame):

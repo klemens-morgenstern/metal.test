@@ -2,7 +2,7 @@ import sys
 import traceback
 
 import gdb
-from gdb.FrameDecorator import FrameDecorator
+
 
 
 exit_code = None
@@ -24,7 +24,7 @@ class exit_stub(gdb.Breakpoint):
 
     def exit(self, exit_code):
         try:
-            sys.stdout.write("***metal-newlib*** Log: Invoking _exit with {}\n".format(exit_code))
+            gdb.write("***metal-newlib*** Log: Invoking _exit with {}\n".format(exit_code))
             gdb.execute("set confirm off")
             gdb.execute("quit {}".format(exit_code))
         except gdb.error as e:
