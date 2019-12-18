@@ -240,19 +240,23 @@ class metal_test_backend(gdb.Breakpoint):
         self.range = None
 
     def stop(self):
-        fr = gdb.selected_frame()
-        args = [arg for arg in fr.block() if arg.is_argument]
-        oper = str(args[1].value(fr))[len("__metal_oper_"):]
-
         try:
-            if oper == "exec":
-                self.exec_(args, fr)
-            else:
-                getattr(self, oper)(args, fr)
-        except Exception as e:
-            gdb.write("Internal error {}\n".format(e), gdb.STDERR)
+            fr = gdb.selected_frame()
+            args = [arg for arg in fr.block() if arg.is_argument]
+            oper = str(args[1].value(fr))[len("__metal_oper_"):]
 
-        gdb.post_event(lambda: gdb.execute("continue"))
+            try:
+                if oper == "exec":
+                    self.exec_(args, fr)
+                else:
+                    getattr(self, oper)(args, fr)
+            except Exception as e:
+                gdb.write("Internal error {}\n".format(e), gdb.STDERR)
+
+            gdb.post_event(lambda: gdb.execute("continue"))
+        except gdb.error as e:
+            gdb.write("Error in metal-unit.py: {}".format(e))
+            raise e
 
     def enter_case(self, args, frame):
         id = str_arg(args, frame, 0)

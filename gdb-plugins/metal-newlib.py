@@ -1,3 +1,5 @@
+import traceback
+
 import gdb
 import os
 
@@ -153,20 +155,25 @@ class metal_test_backend(gdb.Breakpoint):
         self.open_flags = None
 
     def stop(self):
-        fr = gdb.selected_frame()
-        args = [arg for arg in fr.block() if arg.is_argument]
-
-        type = str(args[0].value())
-        oper = str(args[1].value(fr))[len("metal_func_"):]
-
         try:
-            getattr(self, oper)(args, fr)
-        except OSError as e:
-            gdb.execute("set var errno = {}".format(e.errno))
-        except Exception as e:
-            gdb.write("Internal error {}\n".format(e), gdb.STDERR)
+            fr = gdb.selected_frame()
+            args = [arg for arg in fr.block() if arg.is_argument]
 
-        gdb.post_event(lambda: gdb.execute("continue"))
+            type = str(args[0].value())
+            oper = str(args[1].value(fr))[len("metal_func_"):]
+
+            try:
+                getattr(self, oper)(args, fr)
+            except OSError as e:
+                gdb.execute("set var errno = {}".format(e.errno))
+            except Exception as e:
+                gdb.write("Internal error {}\n".format(e), gdb.STDERR)
+
+            gdb.post_event(lambda: gdb.execute("continue"))
+        except gdb.error as e:
+            gdb.write("Error in metal-newlib.py: {}".format(e))
+            traceback.print_exc()
+            raise e
 
     def close(self, args, frame):
         fd = int(str(args[3].value()))

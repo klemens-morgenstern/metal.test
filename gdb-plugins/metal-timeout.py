@@ -1,4 +1,6 @@
 import sys
+import traceback
+
 import gdb
 import threading
 import datetime
@@ -62,8 +64,16 @@ class Timeout(gdb.Parameter):
     def exit(self, ev): self.gdb_exited = True
 
 
+def wrap(func):
+    try: func()
+    except gdb.error as e:
+        gdb.write("Error in metal-timeout.py: {}".format(e))
+        traceback.print_exc()
+        raise e
+
+
 timeout = Timeout()
 
-gdb.events.cont.connect(timeout.cont)
-gdb.events.stop.connect(timeout.stop)
-gdb.events.exited.connect(timeout.exit)
+gdb.events.cont.connect(wrap(timeout.cont))
+gdb.events.stop.connect(wrap(timeout.stop))
+gdb.events.exited.connect(wrap(timeout.exit))

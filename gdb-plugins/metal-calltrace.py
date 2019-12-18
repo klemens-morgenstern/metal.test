@@ -1,5 +1,7 @@
 import json
 import sys
+import traceback
+
 import gdb
 import ctypes
 
@@ -194,15 +196,19 @@ class metal_calltrace(gdb.Breakpoint):
         self.cts = []
 
     def stop(self):
+        try:
+            frame = gdb.selected_frame()
+            args = [arg for arg in frame.block() if arg.is_argument]
 
-        frame = gdb.selected_frame()
-        args = [arg for arg in frame.block() if arg.is_argument]
+            for arg in args:
+                exit_code = arg.value(frame)
+                break
 
-        for arg in args:
-            exit_code = arg.value(frame)
-            break
-
-        gdb.post_event(lambda: self.exit(exit_code))
+            gdb.post_event(lambda: self.exit(exit_code))
+        except gdb.error as e:
+            gdb.write("Error in metal-exitcode.py: {}".format(e))
+            traceback.print_exc()
+            raise e
 
     def enter(self, args, frame):
 
