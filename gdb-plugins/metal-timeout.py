@@ -64,8 +64,8 @@ class Timeout(gdb.Parameter):
     def exit(self, ev): self.gdb_exited = True
 
 
-def wrap(func):
-    try: func()
+def wrap(func, ev):
+    try: func(ev)
     except gdb.error as e:
         gdb.write("Error in metal-timeout.py: {}".format(e))
         traceback.print_exc()
@@ -74,6 +74,6 @@ def wrap(func):
 
 timeout = Timeout()
 
-gdb.events.cont.connect(wrap(timeout.cont))
-gdb.events.stop.connect(wrap(timeout.stop))
-gdb.events.exited.connect(wrap(timeout.exit))
+gdb.events.cont.connect(lambda ev: wrap(timeout.cont, ev))
+gdb.events.stop.connect(lambda ev: wrap(timeout.stop, ev))
+gdb.events.exited.connect(lambda ev: wrap(timeout.exit, ev))
