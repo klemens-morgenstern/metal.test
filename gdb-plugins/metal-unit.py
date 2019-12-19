@@ -222,8 +222,13 @@ def print_from_frame(args, frame, bw, frame_nr, name):
 
             mem = gdb.selected_inferior().read_memory(addr, sz)
             res = ""
-            for b in mem.tobytes():
-                res += bin(b)[2:]
+            if isinstance(mem, memoryview):
+                for b in mem.tobytes():
+                    res += bin(b)[2:]
+            else:
+                for b in mem:
+                    res += bin(ord(b))[2:]
+
 
             return "0b" + res
         sym = gdb.parse_and_eval(name)
