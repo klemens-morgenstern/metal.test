@@ -425,7 +425,7 @@ class metal_test_backend(gdb.Breakpoint):
 
         lhs_val = print_from_frame(args, frame, bw, 1, lhs)
         rhs_val = print_from_frame(args, frame, bw, 1, rhs)
-        tolerance_val = print_from_frame(args, frame, bw, 1, rhs)
+        tolerance_val = print_from_frame(args, frame, bw, 1, tolerance)
 
         descr = "**range**[{}]".format(len(self.range.tests)) if self.range else "{} == {} +/- {}".format(lhs, rhs, tolerance)
 
@@ -450,7 +450,7 @@ class metal_test_backend(gdb.Breakpoint):
 
         lhs_val = print_from_frame(args, frame, bw, 1, lhs)
         rhs_val = print_from_frame(args, frame, bw, 1, rhs)
-        tolerance_val = print_from_frame(args, frame, bw, 1, rhs)
+        tolerance_val = print_from_frame(args, frame, bw, 1, tolerance)
 
         descr = "**range**[{}]".format(len(self.range.tests)) if self.range else "{} == {} +/- {}~".format(lhs, rhs, tolerance)
 
@@ -475,7 +475,7 @@ class metal_test_backend(gdb.Breakpoint):
 
         lhs_val = print_from_frame(args, frame, bw, 1, lhs)
         rhs_val = print_from_frame(args, frame, bw, 1, rhs)
-        tolerance_val = print_from_frame(args, frame, bw, 1, rhs)
+        tolerance_val = print_from_frame(args, frame, bw, 1, tolerance)
         descr = "**range**[{}]".format(len(self.range.tests)) if self.range else "{} == {} +/- {}%".format(lhs, rhs, tolerance)
         gdb.write("{} [{}equality]: {}; [{} != {} +/- {}%]\n".format(prefix, bw_s, descr, lhs_val, rhs_val, tolerance_val))
         ck["type"] = "close_per"
