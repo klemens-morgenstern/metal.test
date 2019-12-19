@@ -6,7 +6,7 @@ import traceback
 import gdb
 
 
-class statistic:
+class statistic(object):
     def __init__(self):
         self.executed = 0
         self.errors = 0
