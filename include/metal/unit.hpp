@@ -99,18 +99,18 @@ static_assert(Condition, "\n" METAL_LOCATION_STR() " static assertion failed: " 
 #define METAL_STATIC_ASSERT_NOT_EQUAL(Lhs, Rhs) METAL_STATIC_ASSERT(Rhs != Lhs, #Lhs " != " #Rhs)
 #define METAL_STATIC_ASSERT_NOT_EQUAL_BITWISE(Lhs, Rhs) METAL_STATIC_ASSERT(METAL_BITWISE_EXPR(Lhs, Rhs, !=, ||), " [bitwise] " #Lhs " != " #Rhs)
 
-#define METAL_ASSERT_CLOSE(Lhs, Rhs, Tolerance) __metal_impl(__metal_level_assert, __metal_oper_close, (Rhs <= (Lhs + Tolerance)) && (Rhs >= (Lhs - Tolerance)), 0, #Rhs, #Lhs, #Tolerance, __FILE__, __LINE__);
-#define METAL_EXPECT_CLOSE(Lhs, Rhs, Tolerance) __metal_impl(__metal_level_expect, __metal_oper_close, (Rhs <= (Lhs + Tolerance)) && (Rhs >= (Lhs - Tolerance)), 0, #Rhs, #Lhs, #Tolerance, __FILE__, __LINE__);
+#define METAL_ASSERT_CLOSE(Lhs, Rhs, Tolerance) __metal_impl(__metal_level_assert, __metal_oper_close, (Rhs <= (Lhs + Tolerance)) && (Rhs >= (Lhs - Tolerance)), 0, #Lhs, #Rhs, #Tolerance, __FILE__, __LINE__);
+#define METAL_EXPECT_CLOSE(Lhs, Rhs, Tolerance) __metal_impl(__metal_level_expect, __metal_oper_close, (Rhs <= (Lhs + Tolerance)) && (Rhs >= (Lhs - Tolerance)), 0, #Lhs, #Rhs, #Tolerance, __FILE__, __LINE__);
 #define METAL_STATIC_ASSERT_CLOSE(Lhs, Rhs, Tolerance) \
     METAL_STATIC_ASSERT((Lhs <= (Rhs + Tolerance)) && (Lhs >= (Rhs - Tolerance)) , #Lhs " == " #Rhs " +/- " #Tolerance)
 
-#define METAL_ASSERT_CLOSE_RELATIVE(Lhs, Rhs, Tolerance) __metal_impl(__metal_level_assert, __metal_oper_close_rel, (Rhs <= (Lhs * (1. + Tolerance))) && (Rhs >= (Lhs * (1. - Tolerance))), 0, #Rhs, #Lhs, #Tolerance, __FILE__, __LINE__);
-#define METAL_EXPECT_CLOSE_RELATIVE(Lhs, Rhs, Tolerance) __metal_impl(__metal_level_expect, __metal_oper_close_rel, (Rhs <= (Lhs * (1. + Tolerance))) && (Rhs >= (Lhs * (1. - Tolerance))), 0, #Rhs, #Lhs, #Tolerance, __FILE__, __LINE__);
+#define METAL_ASSERT_CLOSE_RELATIVE(Lhs, Rhs, Tolerance) __metal_impl(__metal_level_assert, __metal_oper_close_rel, (Rhs <= (Lhs * (1. + Tolerance))) && (Rhs >= (Lhs * (1. - Tolerance))), 0, #Lhs, #Rhs, #Tolerance, __FILE__, __LINE__);
+#define METAL_EXPECT_CLOSE_RELATIVE(Lhs, Rhs, Tolerance) __metal_impl(__metal_level_expect, __metal_oper_close_rel, (Rhs <= (Lhs * (1. + Tolerance))) && (Rhs >= (Lhs * (1. - Tolerance))), 0, #Lhs, #Rhs, #Tolerance, __FILE__, __LINE__);
 #define METAL_STATIC_ASSERT_CLOSE_RELATIVE(Lhs, Rhs, Tolerance) \
     METAL_STATIC_ASSERT((Lhs <= (Rhs * (1. + Tolerance))) && (Lhs >= (Rhs * (1. - Tolerance))) , #Lhs " == " #Rhs " +/- " #Tolerance " ~")
 
-#define METAL_ASSERT_CLOSE_PERCENT(Lhs, Rhs, Tolerance) __metal_impl(__metal_level_assert, __metal_oper_close_perc, (Rhs <= (Lhs * (1. + ( Tolerance / 100.)))) && (Rhs >= (Lhs * (1. - (Tolerance / 100.)))), 0, #Rhs, #Lhs, #Tolerance, __FILE__, __LINE__);
-#define METAL_EXPECT_CLOSE_PERCENT(Lhs, Rhs, Tolerance) __metal_impl(__metal_level_expect, __metal_oper_close_perc, (Rhs <= (Lhs * (1. + ( Tolerance / 100.)))) && (Rhs >= (Lhs * (1. - (Tolerance / 100.)))), 0, #Rhs, #Lhs, #Tolerance, __FILE__, __LINE__);
+#define METAL_ASSERT_CLOSE_PERCENT(Lhs, Rhs, Tolerance) __metal_impl(__metal_level_assert, __metal_oper_close_perc, (Rhs <= (Lhs * (1. + ( Tolerance / 100.)))) && (Rhs >= (Lhs * (1. - (Tolerance / 100.)))), 0, #Lhs, #Rhs, #Tolerance, __FILE__, __LINE__);
+#define METAL_EXPECT_CLOSE_PERCENT(Lhs, Rhs, Tolerance) __metal_impl(__metal_level_expect, __metal_oper_close_perc, (Rhs <= (Lhs * (1. + ( Tolerance / 100.)))) && (Rhs >= (Lhs * (1. - (Tolerance / 100.)))), 0, #Lhs, #Rhs, #Tolerance, __FILE__, __LINE__);
 #define METAL_STATIC_ASSERT_CLOSE_PERCENT(Lhs, Rhs, Tolerance) \
     METAL_STATIC_ASSERT((Rhs <= (Lhs * (1. + (Tolerance / 100.)))) && (Rhs >= (Lhs * (1. - ( Tolerance / 100.)))) , #Lhs " == " #Rhs " +/- " #Tolerance "%")
 
