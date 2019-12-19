@@ -204,7 +204,7 @@ class metal_calltrace(gdb.Breakpoint):
                 exit_code = arg.value(frame)
                 break
 
-            gdb.post_event(lambda: self.exit(exit_code))
+            return False
         except gdb.error as e:
             gdb.write("Error in metal-exitcode.py: {}".format(e))
             traceback.print_exc()

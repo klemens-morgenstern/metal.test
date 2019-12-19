@@ -255,7 +255,7 @@ class metal_test_backend(gdb.Breakpoint):
                 gdb.write("Internal error {}\n".format(e), gdb.STDERR)
                 raise e
 
-            gdb.post_event(lambda: gdb.execute("continue"))
+            return False
         except gdb.error as e:
             gdb.write("Error in metal-unit.py: {}".format(e), gdb.STDERR)
             traceback.print_exc()

@@ -22,7 +22,7 @@ class exit_stub(gdb.Breakpoint):
 
         gdb.post_event(lambda: self.exit(exit_code))
 
-
+        return Trues
     def exit(self, exit_code):
         try:
             gdb.write("***metal-newlib*** Log: Invoking _exit with {}\n".format(exit_code))

@@ -169,7 +169,7 @@ class metal_test_backend(gdb.Breakpoint):
             except Exception as e:
                 gdb.write("Internal error {}\n".format(e), gdb.STDERR)
 
-            gdb.post_event(lambda: gdb.execute("continue"))
+            return False
         except gdb.error as e:
             gdb.write("Error in metal-newlib.py: {}".format(e))
             traceback.print_exc()
