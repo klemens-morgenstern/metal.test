@@ -13,7 +13,7 @@ class statistic(object):
         self.warnings = 0
         self.children = []
         self.tests = []
-        self.cancelled = True
+        self.cancelled = False
         self.parent = None
 
     def __iadd__(self, rhs):
