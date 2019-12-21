@@ -636,7 +636,7 @@ class metal_test_backend(gdb.Breakpoint):
                 with open(selectJsonSink.value, "w") as fl:
                     fl.write(json.dumps(self.summary.toDict()))
 
-    def report_cancelled(self, args, frame):
+    def report_canceled(self, args, frame):
         self.summary += self.case
         self.report(args, frame)
 
