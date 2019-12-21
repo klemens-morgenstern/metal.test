@@ -100,7 +100,7 @@ class ranged_test(statistic):
         self.index = 0
         self.critical_fail = False
 
-    def cancel(self, args, frame):
+    def cancel(self, args, frame, rep):
         self.critical_fail = True
 
     def exit(self, args, frame, report):
@@ -290,8 +290,10 @@ class metal_test_backend(gdb.Breakpoint):
 
         self.summary += self.case
         self.current_scope = self.case.parent
-        gdb.write("{} exiting test case [{}]: {{executed: {}, warnings: {}, errors: {}}}\n".format(
-            loc_str(args, frame), case_id, self.case.executed, self.case.warnings, self.case.errors))
+
+        gdb.write("{} {} test case [{}]: {{executed: {}, warnings: {}, errors: {}}}\n".format(
+            loc_str(args, frame), "canceled" if self.case.cancelled else "exited",
+            case_id, self.case.executed, self.case.warnings, self.case.errors))
 
         par = self.case.parent
         delattr(self.case, "parent")
@@ -331,8 +333,8 @@ class metal_test_backend(gdb.Breakpoint):
         self.range.exit(args, frame, self.report)
 
         descr = str_arg(args, frame, 0)
-        gdb.write("{} exiting ranged test [{}]: {{executed: {}, warnings: {}, errors: {}}}\n".format(
-            loc_str(args, frame), descr, self.case.executed, self.case.warnings, self.case.errors))
+        gdb.write("{} {}} ranged test [{}]: {{executed: {}, warnings: {}, errors: {}}}\n".format(
+            loc_str(args, frame), "canceled" if self.case.cancelled else "exited", descr, self.case.executed, self.case.warnings, self.case.errors))
 
         self.range.parent.executed += 1
         if self.range.errors > 0:
@@ -367,7 +369,7 @@ class metal_test_backend(gdb.Breakpoint):
         gdb.write("{} [message]: {}\n".format(prefix, message))
         ck["message"] = message
         ck["type"] = "message"
-        cs.append_test(ck, args, frame, self.report)
+        cs.append_test(ck, args, frame, self.report_canceled)
 
     def plain(self, args, frame):
         ck, prefix, cs = self.__check(args, frame)
@@ -375,7 +377,7 @@ class metal_test_backend(gdb.Breakpoint):
         gdb.write("{} [expression]: {}\n".format(prefix, message))
         ck["message"] = message
         ck["type"] = "plain"
-        cs.append_test(ck, args, frame, self.report)
+        cs.append_test(ck, args, frame, self.report_canceled)
 
     def predicate(self, args, frame):
         ck,prefix, current_scope = self.__check(args, frame)
@@ -385,7 +387,7 @@ class metal_test_backend(gdb.Breakpoint):
         ck["name"] = name
         ck["args"] = args_
         ck["type"] = "plain"
-        current_scope.append_test(ck, args, frame, self.report)
+        current_scope.append_test(ck, args, frame, self.report_canceled)
 
     def equal(self, args, frame):
         ck, prefix, current_scope = self.__check(args, frame)
@@ -406,7 +408,7 @@ class metal_test_backend(gdb.Breakpoint):
         ck["rhs"] = rhs
         ck["lhs_val"] = lhs_val
         ck["rhs_val"] = rhs_val
-        current_scope.append_test(ck, args, frame, self.report)
+        current_scope.append_test(ck, args, frame, self.report_canceled)
 
     def not_equal(self, args, frame):
         ck, prefix ,current_scope = self.__check(args, frame)
@@ -427,7 +429,7 @@ class metal_test_backend(gdb.Breakpoint):
         ck["rhs"] = rhs
         ck["lhs_val"] = lhs_val
         ck["rhs_val"] = rhs_val
-        current_scope.append_test(ck, args, frame, self.report)
+        current_scope.append_test(ck, args, frame, self.report_canceled)
 
     def close(self, args, frame):
         ck, prefix, current_scope = self.__check(args, frame)
@@ -452,7 +454,7 @@ class metal_test_backend(gdb.Breakpoint):
         ck["lhs_val"] = lhs_val
         ck["rhs_val"] = rhs_val
         ck["tolerance_vale"] = tolerance_val
-        current_scope.append_test(ck, args, frame, self.report)
+        current_scope.append_test(ck, args, frame, self.report_canceled)
 
     def close_rel(self, args, frame):
         ck, prefix, current_scope = self.__check(args, frame)
@@ -477,7 +479,7 @@ class metal_test_backend(gdb.Breakpoint):
         ck["lhs_val"] = lhs_val
         ck["rhs_val"] = rhs_val
         ck["tolerance_vale"] = tolerance_val
-        current_scope.append_test(ck, args, frame, self.report)
+        current_scope.append_test(ck, args, frame, self.report_canceled)
 
     def close_perc(self, args, frame):
         ck, prefix, current_scope = self.__check(args, frame)
@@ -500,7 +502,7 @@ class metal_test_backend(gdb.Breakpoint):
         ck["lhs_val"] = lhs_val
         ck["rhs_val"] = rhs_val
         ck["tolerance_vale"] = tolerance_val
-        current_scope.append_test(ck, args, frame, self.report)
+        current_scope.append_test(ck, args, frame, self.report_canceled)
 
 
     def ge(self, args, frame):
@@ -522,7 +524,7 @@ class metal_test_backend(gdb.Breakpoint):
         ck["rhs"] = rhs
         ck["lhs_val"] = lhs_val
         ck["rhs_val"] = rhs_val
-        current_scope.append_test(ck, args, frame, self.report)
+        current_scope.append_test(ck, args, frame, self.report_canceled)
 
     def greater(self, args, frame):
         ck, prefix, current_scope = self.__check(args, frame)
@@ -543,7 +545,7 @@ class metal_test_backend(gdb.Breakpoint):
         ck["rhs"] = rhs
         ck["lhs_val"] = lhs_val
         ck["rhs_val"] = rhs_val
-        current_scope.append_test(ck, args, frame, self.report)
+        current_scope.append_test(ck, args, frame, self.report_canceled)
 
 
     def le(self, args, frame):
@@ -565,7 +567,7 @@ class metal_test_backend(gdb.Breakpoint):
         ck["rhs"] = rhs
         ck["lhs_val"] = lhs_val
         ck["rhs_val"] = rhs_val
-        current_scope.append_test(ck, args, frame, self.report)
+        current_scope.append_test(ck, args, frame, self.report_canceled)
 
     def lesser(self, args, frame):
         ck, prefix, current_scope = self.__check(args, frame)
@@ -586,7 +588,7 @@ class metal_test_backend(gdb.Breakpoint):
         ck["rhs"] = rhs
         ck["lhs_val"] = lhs_val
         ck["rhs_val"] = rhs_val
-        current_scope.append_test(ck, args, frame, self.report)
+        current_scope.append_test(ck, args, frame, self.report_canceled)
 
     def exception(self, args, frame):
         ck, prefix, current_scope = self.__check(args, frame)
@@ -596,31 +598,31 @@ class metal_test_backend(gdb.Breakpoint):
         ck["type"] = "exception"
         ck["got"] = got
         ck["expected"] = expected
-        current_scope.append_test(ck, args, frame, self.report)
+        current_scope.append_test(ck, args, frame, self.report_canceled)
 
     def any_exception(self, args, frame):
         ck, prefix, current_scope = self.__check(args, frame)
         gdb.write("{} throw any exception.\n".format(prefix))
         ck["type"] = "any_exception"
-        current_scope.append_test(ck, args, frame, self.report)
+        current_scope.append_test(ck, args, frame, self.report_canceled)
 
     def no_exception(self, args, frame):
         ck, prefix,current_scope = self.__check(args, frame)
         gdb.write("{} throw no exception.\n".format(prefix))
         ck["type"] = "no_exception"
-        current_scope.append_test(ck, args, frame, self.report)
+        current_scope.append_test(ck, args, frame, self.report_canceled)
 
     def no_exec(self, args, frame):
         ck, prefix, current_scope = self.__check(args, frame)
         gdb.write("{} do not execute.\n".format(prefix))
         ck["type"] = "no_execute_check"
-        current_scope.append_test(ck, args, frame, self.report)
+        current_scope.append_test(ck, args, frame, self.report_canceled)
 
     def exec_(self, args, frame):
         ck, prefix, current_scope = self.__check(args, frame)
         gdb.write("{} do execute.\n".format(prefix))
         ck["type"] = "execute_check"
-        current_scope.append_test(ck, args, frame, self.report)
+        current_scope.append_test(ck, args, frame, self.report_canceled)
 
     def report(self, args, frame):
 
@@ -633,6 +635,10 @@ class metal_test_backend(gdb.Breakpoint):
             else:
                 with open(selectJsonSink.value, "w") as fl:
                     fl.write(json.dumps(self.summary.toDict()))
+
+    def report_cancelled(self, args, frame):
+        self.summary += self.case
+        self.report(args, frame)
 
     def __check(self, args, frame):
 
