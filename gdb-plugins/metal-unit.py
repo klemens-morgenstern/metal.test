@@ -264,14 +264,10 @@ class metal_test_backend(gdb.Breakpoint):
             args = [arg for arg in fr.block() if arg.is_argument]
             oper = str(args[1].value(fr))[len("__metal_oper_"):]
 
-            try:
-                if oper == "exec":
-                    self.exec_(args, fr)
-                else:
-                    getattr(self, oper)(args, fr)
-            except Exception as e:
-                gdb.write("Internal error {}\n".format(e), gdb.STDERR)
-                raise e
+            if oper == "exec":
+                self.exec_(args, fr)
+            else:
+                getattr(self, oper)(args, fr)
 
             return False
         except gdb.error as e:
