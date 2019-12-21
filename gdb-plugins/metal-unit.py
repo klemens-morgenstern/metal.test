@@ -15,6 +15,7 @@ class statistic(object):
         self.tests = []
         self.cancelled = False
         self.parent = None
+        self.name = "__main__"
 
     def __iadd__(self, rhs):
         self.executed += rhs.executed
@@ -39,12 +40,13 @@ class statistic(object):
                 is_main = fr.function().name == "main"
 
                 if is_metal_call:
-                    case_id = str_arg(args, frame, 0)
+                    stat_id = str_arg(args, frame, 0)
                     fr.select()
                     self.cancelled = True
                     gdb.write("{} canceling test case [{}]: {{executed: {}, warnings: {}, errors: {}}}\n".format(
-                        loc_str(args, frame), case_id, self.executed, self.warnings, self.errors))
+                        loc_str(args, frame), self.name, self.executed, self.warnings, self.errors))
                     gdb.execute("return")
+                    report(args, frame)
                     return
 
                 if is_main:
@@ -53,7 +55,7 @@ class statistic(object):
                     gdb.write("{} canceling to main: {{executed: {}, warnings: {}, errors: {}}}\n".format(
                                     loc_str(args, frame), self.executed, self.warnings, self.errors))
                     gdb.execute("return")
-
+                    report(args, frame)
                 fr = fr.older()
         except gdb.error as e:
             gdb.write("PANIC!!! Error cancelling, couldn't find frame to cancel to: {}\n".format(e))
@@ -293,7 +295,7 @@ class metal_test_backend(gdb.Breakpoint):
 
         gdb.write("{} {} test case [{}]: {{executed: {}, warnings: {}, errors: {}}}\n".format(
             loc_str(args, frame), "canceled" if self.case.cancelled else "exited",
-            case_id, self.case.executed, self.case.warnings, self.case.errors))
+            self.case.name, self.case.executed, self.case.warnings, self.case.errors))
 
         par = self.case.parent
         delattr(self.case, "parent")
