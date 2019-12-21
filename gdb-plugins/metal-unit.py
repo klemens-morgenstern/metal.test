@@ -639,7 +639,7 @@ class metal_test_backend(gdb.Breakpoint):
         crit = is_critical(args, frame)
         cs = self.current_scope
         self.current_scope.executed += 1
-        cond = condition(args ,frame)
+        cond = condition(args, frame)
         lvl = level(args, frame)
         if not cond:
             if lvl == Level.expect:
@@ -647,7 +647,6 @@ class metal_test_backend(gdb.Breakpoint):
             else:
                 self.current_scope.errors += 1
             if crit:
-                self.current_scope.cancel(args, frame, self.report)
                 self.current_scope = self.current_scope.parent
 
         f = file(args, frame)
