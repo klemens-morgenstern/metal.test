@@ -2,8 +2,12 @@ import re
 import sys
 import json
 import traceback
-
+import sys
 import gdb
+
+str = str
+if sys.version_info[0] < 3:
+    str = unicode
 
 
 class statistic(object):
@@ -154,6 +158,20 @@ class SelectJsonSink(gdb.Parameter):
 
 selectJsonSink = SelectJsonSink()
 
+class PrintLevel(gdb.Parameter):
+    def __init__(self):
+        super(PrintLevel, self).__init__("metal-test-print-level",
+                                             gdb.COMMAND_DATA,
+                                             gdb.PARAM_ENUM, ["all", "warning", "error"])
+        self.value = "all"
+
+    set_doc = '''Set the level for logging.'''
+    show_doc = '''This sets the level for notifications to be printed.'''
+
+
+printLevel = PrintLevel()
+
+
 
 class Level:
     assertion = 0
@@ -246,10 +264,10 @@ def print_from_frame(args, frame, bw, frame_nr, name):
 
 
             return "0b" + res
-        sym = gdb.parse_and_eval(name)
 
-        return str(sym)
 
+        val = gdb.parse_and_eval(name)
+        str(val)
 
 class metal_test_backend(gdb.Breakpoint):
     def __init__(self):
@@ -272,7 +290,7 @@ class metal_test_backend(gdb.Breakpoint):
                 getattr(self, oper)(args, fr)
 
             return False
-        except gdb.error as e:
+        except Exception as e:
             gdb.write("Error in metal-unit.py: {}".format(e), gdb.STDERR)
             traceback.print_exc()
             raise e
@@ -306,7 +324,7 @@ class metal_test_backend(gdb.Breakpoint):
         if isinstance(self.current_scope, ranged_test):
             gdb.write("{} critical error: Twice enter into ranged test, check your test!!\n".format(loc_str(args, frame)))
             return
-        ck, prefix, cs = self.__check(args, frame)
+        ck, prefix, cs, should_print = self.__check(args, frame)
 
 
         cond = condition(args, frame)
@@ -335,8 +353,8 @@ class metal_test_backend(gdb.Breakpoint):
         self.range.exit(args, frame, self.report)
 
         descr = str_arg(args, frame, 0)
-        gdb.write("{} {}} ranged test [{}]: {{executed: {}, warnings: {}, errors: {}}}\n".format(
-            loc_str(args, frame), "canceled" if self.case.cancelled else "exited", descr, self.case.executed, self.case.warnings, self.case.errors))
+        gdb.write("{} {} ranged test [{}]: {{executed: {}, warnings: {}, errors: {}}}\n".format(
+            loc_str(args, frame), "canceled" if self.range.cancelled else "exited", descr, self.range.executed, self.range.warnings, self.range.errors))
 
         self.range.parent.executed += 1
         if self.range.errors > 0:
@@ -366,33 +384,36 @@ class metal_test_backend(gdb.Breakpoint):
         self.current_scope.tests.append({"type": "checkpoint", "file": f, "line": l})
 
     def message(self, args, frame):
-        ck, prefix, cs = self.__check(args, frame)
+        ck, prefix, cs, should_print = self.__check(args, frame)
         message = str_arg(args, frame, 0)
-        gdb.write("{} [message]: {}\n".format(prefix, message))
+        if should_print:
+            gdb.write("{} [message]: {}\n".format(prefix, message))
         ck["message"] = message
         ck["type"] = "message"
         cs.append_test(ck, args, frame, self.report_canceled)
 
     def plain(self, args, frame):
-        ck, prefix, cs = self.__check(args, frame)
+        ck, prefix, cs, should_print = self.__check(args, frame)
         message = str_arg(args, frame, 0)
-        gdb.write("{} [expression]: {}\n".format(prefix, message))
+        if should_print:
+            gdb.write("{} [expression]: {}\n".format(prefix, message))
         ck["message"] = message
         ck["type"] = "plain"
         cs.append_test(ck, args, frame, self.report_canceled)
 
     def predicate(self, args, frame):
-        ck,prefix, current_scope = self.__check(args, frame)
+        ck, prefix, current_scope, should_print = self.__check(args, frame)
         name = str_arg(args, frame, 0)
         args_ = str_arg(args, frame, 1)
-        gdb.write("{} [predicate]: {}({})\n".format(prefix, name, args_))
+        if should_print:
+            gdb.write("{} [predicate]: {}({})\n".format(prefix, name, args_))
         ck["name"] = name
         ck["args"] = args_
         ck["type"] = "plain"
         current_scope.append_test(ck, args, frame, self.report_canceled)
 
     def equal(self, args, frame):
-        ck, prefix, current_scope = self.__check(args, frame)
+        ck, prefix, current_scope, should_print = self.__check(args, frame)
         lhs = str_arg(args, frame, 0)
         rhs = str_arg(args, frame, 1)
         bw = bitwise(args, frame)
@@ -403,7 +424,8 @@ class metal_test_backend(gdb.Breakpoint):
 
         descr = "**range**[{}]".format(len(self.range.tests)) if self.range else "{} == {}".format(lhs, rhs)
 
-        gdb.write("{} [{}equality]: {}; [{} == {}]\n".format(prefix, bw_s, descr, lhs_val, rhs_val))
+        if should_print:
+            gdb.write("{} [{}equality]: {}; [{} == {}]\n".format(prefix, bw_s, descr, lhs_val, rhs_val))
         ck["type"] = "equal"
         ck["bitwise"] = bw
         ck["lhs"] = lhs
@@ -413,7 +435,7 @@ class metal_test_backend(gdb.Breakpoint):
         current_scope.append_test(ck, args, frame, self.report_canceled)
 
     def not_equal(self, args, frame):
-        ck, prefix ,current_scope = self.__check(args, frame)
+        ck, prefix, current_scope, should_print = self.__check(args, frame)
         lhs = str_arg(args, frame, 0)
         rhs = str_arg(args, frame, 1)
         bw = bitwise(args, frame)
@@ -424,7 +446,8 @@ class metal_test_backend(gdb.Breakpoint):
 
         descr = "**range**[{}]".format(len(self.range.tests)) if self.range else "{} != {}".format(lhs, rhs)
 
-        gdb.write("{} [{}equality]: {}; [{} != {}]\n".format(prefix, bw_s, descr, lhs_val, rhs_val))
+        if should_print:
+            gdb.write("{} [{}equality]: {}; [{} != {}]\n".format(prefix, bw_s, descr, lhs_val, rhs_val))
         ck["type"] = "not_equal"
         ck["bitwise"] = bw
         ck["lhs"] = lhs
@@ -434,7 +457,7 @@ class metal_test_backend(gdb.Breakpoint):
         current_scope.append_test(ck, args, frame, self.report_canceled)
 
     def close(self, args, frame):
-        ck, prefix, current_scope = self.__check(args, frame)
+        ck, prefix, current_scope, should_print = self.__check(args, frame)
         lhs = str_arg(args, frame, 0)
         rhs = str_arg(args, frame, 1)
         tolerance = str_arg(args, frame, 2)
@@ -447,7 +470,8 @@ class metal_test_backend(gdb.Breakpoint):
 
         descr = "**range**[{}]".format(len(self.range.tests)) if self.range else "{} == {} +/- {}".format(lhs, rhs, tolerance)
 
-        gdb.write("{} [{}equality]: {}; [{} != {} +/- {}]\n".format(prefix, bw_s, descr, lhs_val, rhs_val, tolerance_val))
+        if should_print:
+            gdb.write("{} [{}equality]: {}; [{} != {} +/- {}]\n".format(prefix, bw_s, descr, lhs_val, rhs_val, tolerance_val))
         ck["type"] = "close"
         ck["bitwise"] = bw
         ck["lhs"] = lhs
@@ -459,7 +483,7 @@ class metal_test_backend(gdb.Breakpoint):
         current_scope.append_test(ck, args, frame, self.report_canceled)
 
     def close_rel(self, args, frame):
-        ck, prefix, current_scope = self.__check(args, frame)
+        ck, prefix, current_scope, should_print = self.__check(args, frame)
         lhs = str_arg(args, frame, 0)
         rhs = str_arg(args, frame, 1)
         tolerance = str_arg(args, frame, 2)
@@ -472,7 +496,9 @@ class metal_test_backend(gdb.Breakpoint):
 
         descr = "**range**[{}]".format(len(self.range.tests)) if self.range else "{} == {} +/- {}~".format(lhs, rhs, tolerance)
 
-        gdb.write("{} [{}equality]: {}; [{} != {} +/- {}~]\n".format(prefix, bw_s, descr, lhs_val, rhs_val, tolerance_val))
+        if should_print:
+            gdb.write("{} [{}equality]: {}; [{} != {} +/- {}~]\n".format(prefix, bw_s, descr, lhs_val, rhs_val, tolerance_val))
+
         ck["type"] = "close_rel"
         ck["bitwise"] = bw
         ck["lhs"] = lhs
@@ -484,7 +510,7 @@ class metal_test_backend(gdb.Breakpoint):
         current_scope.append_test(ck, args, frame, self.report_canceled)
 
     def close_perc(self, args, frame):
-        ck, prefix, current_scope = self.__check(args, frame)
+        ck, prefix, current_scope, should_print = self.__check(args, frame)
         lhs = str_arg(args, frame, 0)
         rhs = str_arg(args, frame, 1)
         tolerance = str_arg(args, frame, 2)
@@ -495,7 +521,9 @@ class metal_test_backend(gdb.Breakpoint):
         rhs_val = print_from_frame(args, frame, bw, 1, rhs)
         tolerance_val = print_from_frame(args, frame, bw, 1, tolerance)
         descr = "**range**[{}]".format(len(self.range.tests)) if self.range else "{} == {} +/- {}%".format(lhs, rhs, tolerance)
-        gdb.write("{} [{}equality]: {}; [{} != {} +/- {}%]\n".format(prefix, bw_s, descr, lhs_val, rhs_val, tolerance_val))
+        if should_print:
+            gdb.write("{} [{}equality]: {}; [{} != {} +/- {}%]\n".format(prefix, bw_s, descr, lhs_val, rhs_val, tolerance_val))
+
         ck["type"] = "close_per"
         ck["bitwise"] = bw
         ck["lhs"] = lhs
@@ -508,7 +536,7 @@ class metal_test_backend(gdb.Breakpoint):
 
 
     def ge(self, args, frame):
-        ck, prefix, current_scope = self.__check(args, frame)
+        ck, prefix, current_scope, should_print = self.__check(args, frame)
         lhs = str_arg(args, frame, 0)
         rhs = str_arg(args, frame, 1)
         bw = bitwise(args, frame)
@@ -519,7 +547,9 @@ class metal_test_backend(gdb.Breakpoint):
 
         descr = "**range**[{}]".format(len(self.range.tests)) if self.range else "{} >= {}".format(lhs, rhs)
 
-        gdb.write("{} [{}comparison]: {}; [{} >= {}]\n".format(prefix, bw_s, descr, lhs_val, rhs_val))
+        if should_print:
+            gdb.write("{} [{}comparison]: {}; [{} >= {}]\n".format(prefix, bw_s, descr, lhs_val, rhs_val))
+
         ck["type"] = "ge"
         ck["bitwise"] = bw
         ck["lhs"] = lhs
@@ -529,7 +559,7 @@ class metal_test_backend(gdb.Breakpoint):
         current_scope.append_test(ck, args, frame, self.report_canceled)
 
     def greater(self, args, frame):
-        ck, prefix, current_scope = self.__check(args, frame)
+        ck, prefix, current_scope, should_print = self.__check(args, frame)
         lhs = str_arg(args, frame, 0)
         rhs = str_arg(args, frame, 1)
         bw = bitwise(args, frame)
@@ -540,7 +570,9 @@ class metal_test_backend(gdb.Breakpoint):
 
         descr = "**range**[{}]".format(len(self.range.tests)) if self.range else "{} > {}".format(lhs, rhs)
 
-        gdb.write("{} [{}comparison]: {}; [{} > {}]\n".format(prefix, bw_s, descr, lhs_val, rhs_val))
+        if should_print:
+            gdb.write("{} [{}comparison]: {}; [{} > {}]\n".format(prefix, bw_s, descr, lhs_val, rhs_val))
+
         ck["type"] = "ge"
         ck["bitwise"] = bw
         ck["lhs"] = lhs
@@ -551,7 +583,7 @@ class metal_test_backend(gdb.Breakpoint):
 
 
     def le(self, args, frame):
-        ck, prefix, current_scope = self.__check(args, frame)
+        ck, prefix, current_scope, should_print = self.__check(args, frame)
         lhs = str_arg(args, frame, 0)
         rhs = str_arg(args, frame, 1)
         bw = bitwise(args, frame)
@@ -562,7 +594,9 @@ class metal_test_backend(gdb.Breakpoint):
 
         descr = "**range**[{}]".format(len(self.range.tests)) if self.range else "{} <= {}".format(lhs, rhs)
 
-        gdb.write("{} [{}comparison]: {}; [{} <= {}]\n".format(prefix, bw_s, descr, lhs_val, rhs_val))
+        if should_print:
+            gdb.write("{} [{}comparison]: {}; [{} <= {}]\n".format(prefix, bw_s, descr, lhs_val, rhs_val))
+
         ck["type"] = "le"
         ck["bitwise"] = bw
         ck["lhs"] = lhs
@@ -572,7 +606,7 @@ class metal_test_backend(gdb.Breakpoint):
         current_scope.append_test(ck, args, frame, self.report_canceled)
 
     def lesser(self, args, frame):
-        ck, prefix, current_scope = self.__check(args, frame)
+        ck, prefix, current_scope, should_print = self.__check(args, frame)
         lhs = str_arg(args, frame, 0)
         rhs = str_arg(args, frame, 1)
         bw = bitwise(args, frame)
@@ -583,7 +617,9 @@ class metal_test_backend(gdb.Breakpoint):
 
         descr = "**range**[{}]".format(len(self.range.tests)) if self.range else "{} < {}".format(lhs, rhs)
 
-        gdb.write("{} [{}comparison]: {}; [{} < {}]\n".format(prefix, bw_s, descr, lhs_val, rhs_val))
+        if should_print:
+            gdb.write("{} [{}comparison]: {}; [{} < {}]\n".format(prefix, bw_s, descr, lhs_val, rhs_val))
+
         ck["type"] = "lesser"
         ck["bitwise"] = bw
         ck["lhs"] = lhs
@@ -593,36 +629,41 @@ class metal_test_backend(gdb.Breakpoint):
         current_scope.append_test(ck, args, frame, self.report_canceled)
 
     def exception(self, args, frame):
-        ck, prefix, current_scope = self.__check(args, frame)
+        ck, prefix, current_scope, should_print = self.__check(args, frame)
         expected = str_arg(args, frame, 0)
         got = str_arg(args, frame, 1)
-        gdb.write("{} throw exception: [{}] got [{}]\n".format(prefix, expected, got))
+        if should_print:
+            gdb.write("{} throw exception: [{}] got [{}]\n".format(prefix, expected, got))
+
         ck["type"] = "exception"
         ck["got"] = got
         ck["expected"] = expected
         current_scope.append_test(ck, args, frame, self.report_canceled)
 
     def any_exception(self, args, frame):
-        ck, prefix, current_scope = self.__check(args, frame)
-        gdb.write("{} throw any exception.\n".format(prefix))
+        ck, prefix, current_scope, should_print = self.__check(args, frame)
+        if should_print:
+            gdb.write("{} throw any exception.\n".format(prefix))
         ck["type"] = "any_exception"
         current_scope.append_test(ck, args, frame, self.report_canceled)
 
     def no_exception(self, args, frame):
-        ck, prefix,current_scope = self.__check(args, frame)
-        gdb.write("{} throw no exception.\n".format(prefix))
+        ck, prefix, current_scope, should_print = self.__check(args, frame)
+        if should_print:
+            gdb.write("{} throw no exception.\n".format(prefix))
         ck["type"] = "no_exception"
         current_scope.append_test(ck, args, frame, self.report_canceled)
 
     def no_exec(self, args, frame):
-        ck, prefix, current_scope = self.__check(args, frame)
+        ck, prefix, current_scope, should_print = self.__check(args, frame)
         gdb.write("{} do not execute.\n".format(prefix))
         ck["type"] = "no_execute_check"
         current_scope.append_test(ck, args, frame, self.report_canceled)
 
     def exec_(self, args, frame):
-        ck, prefix, current_scope = self.__check(args, frame)
-        gdb.write("{} do execute.\n".format(prefix))
+        ck, prefix, current_scope, should_print = self.__check(args, frame)
+        if should_print:
+            gdb.write("{} do execute.\n".format(prefix))
         ck["type"] = "execute_check"
         current_scope.append_test(ck, args, frame, self.report_canceled)
 
@@ -671,7 +712,14 @@ class metal_test_backend(gdb.Breakpoint):
         if self.range:
             res["index"] = len(self.range.tests)
 
-        return res, "{}({}){} {} {}".format(f, l, "critical " if crit else "", lvl_descr, "succeeded" if cond else "failed"), cs
+        should_print = True
+        if printLevel.value == "warning" and cond:
+            should_print = False
+        elif printLevel.value == "error" and (cond or lvl == Level.expect):
+            should_print = False
+
+        return res, "{}({}){} {} {}".format(f, l, "critical " if crit else "", lvl_descr, "succeeded" if cond else "failed"), cs, should_print
+
 
 mtb = metal_test_backend()
 
