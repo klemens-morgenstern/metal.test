@@ -31,7 +31,7 @@ const char* file;
 int line;
 
 
-void __metal_impl(__metal_level lvl,
+void __metal_unit_impl(__metal_level lvl,
                __metal_oper oper,
                int condition,
                int bitwise,

@@ -10,7 +10,7 @@ int __metal_errored = 0;
 #define METAL_NO_INLINE
 #endif
 
-void METAL_NO_INLINE __metal_impl(__metal_level lvl,
+void METAL_NO_INLINE __metal_unit_break(__metal_level lvl,
                __metal_oper oper,
                int condition,
                int bitwise,
@@ -29,7 +29,7 @@ void METAL_NO_INLINE __metal_impl(__metal_level lvl,
 inline void __metal_call(void (*func)(), const char * msg,
 			   const char * file, int line)
 {
-	__metal_impl(__metal_level_expect,
+	__metal_unit_break(__metal_level_expect,
 			  __metal_oper_enter_case,
 			  1,
 			  0,
@@ -39,7 +39,7 @@ inline void __metal_call(void (*func)(), const char * msg,
 			  file,
 			  line);
 	func();
-	__metal_impl(__metal_level_expect,
+	__metal_unit_break(__metal_level_expect,
 			  __metal_oper_exit_case,
 			  1,
 			  0,
@@ -52,7 +52,7 @@ inline void __metal_call(void (*func)(), const char * msg,
 
 int METAL_NO_INLINE __metal_report()
 {
-	__metal_impl(__metal_level_expect,
+	__metal_unit_break(__metal_level_expect,
 		  __metal_oper_report,
 		  0,
 		  0,

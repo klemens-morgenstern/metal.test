@@ -271,7 +271,7 @@ def print_from_frame(args, frame, bw, frame_nr, name):
 
 class metal_test_backend(gdb.Breakpoint):
     def __init__(self):
-        gdb.Breakpoint.__init__(self, "__metal_impl")
+        gdb.Breakpoint.__init__(self, "__metal_unit_break")
 
         self.summary = statistic()
         self.current_scope = self.summary

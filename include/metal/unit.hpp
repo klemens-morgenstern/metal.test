@@ -35,13 +35,13 @@
             __METAL_BITWISE_64(Lhs, Rhs,  Oper, Chain) ) )
 
 #define METAL_BITWISE(Level, Lhs, Rhs, Oper, Chain, OperId) \
-__metal_impl(Level, OperId, METAL_BITWISE_EXPR(Lhs, Rhs, Oper, Chain), 1, #Lhs, #Rhs, #Oper, __FILE__, __LINE__);
+__metal_unit_impl(Level, OperId, METAL_BITWISE_EXPR(Lhs, Rhs, Oper, Chain), 1, #Lhs, #Rhs, #Oper, __FILE__, __LINE__);
 
 #define METAL_RANGE_ENTER(Level, LhsDistance, RhsDistance, Message) \
-__metal_impl(Level, __metal_oper_enter_ranged,  LhsDistance == RhsDistance, 0, Message, #LhsDistance, #RhsDistance, __FILE__, __LINE__);
+__metal_unit_impl(Level, __metal_oper_enter_ranged,  LhsDistance == RhsDistance, 0, Message, #LhsDistance, #RhsDistance, __FILE__, __LINE__);
 
 #define METAL_RANGE_EXIT(Level,  Status, Message) \
-__metal_impl(Level, __metal_oper_exit_ranged, Status, 0, Message, 0, 0,__FILE__, __LINE__);
+__metal_unit_impl(Level, __metal_oper_exit_ranged, Status, 0, Message, 0, 0,__FILE__, __LINE__);
 
 #define METAL_RANGED(Level, LhsBegin, LhsEnd, RhsBegin, RhsEnd, MACRO )                                                \
 {                                                                                                                   \
@@ -71,69 +71,69 @@ __metal_impl(Level, __metal_oper_exit_ranged, Status, 0, Message, 0, 0,__FILE__,
 static_assert(Condition, "\n" METAL_LOCATION_STR() " static assertion failed: " Message "\n");
 
 //Operations
-#define METAL_LOG(Message) __metal_impl(__metal_level_expect, __metal_oper_log, 1, 0, Message, 0, 0, __FILE__, __LINE__);
-#define METAL_CHECKPOINT() __metal_impl(__metal_level_expect, __metal_oper_checkpoint,        1, 0,       0, 0, 0, __FILE__, __LINE__);
-#define METAL_ASSERT_MESSAGE(Condition, Message) __metal_impl(__metal_level_assert, __metal_oper_message, Condition, 0, Message, 0, 0, __FILE__, __LINE__);
-#define METAL_EXPECT_MESSAGE(Condition, Message) __metal_impl(__metal_level_expect, __metal_oper_message, Condition, 0, Message, 0, 0, __FILE__, __LINE__);
+#define METAL_LOG(Message) __metal_unit_impl(__metal_level_expect, __metal_oper_log, 1, 0, Message, 0, 0, __FILE__, __LINE__);
+#define METAL_CHECKPOINT() __metal_unit_impl(__metal_level_expect, __metal_oper_checkpoint,        1, 0,       0, 0, 0, __FILE__, __LINE__);
+#define METAL_ASSERT_MESSAGE(Condition, Message) __metal_unit_impl(__metal_level_assert, __metal_oper_message, Condition, 0, Message, 0, 0, __FILE__, __LINE__);
+#define METAL_EXPECT_MESSAGE(Condition, Message) __metal_unit_impl(__metal_level_expect, __metal_oper_message, Condition, 0, Message, 0, 0, __FILE__, __LINE__);
 
-#define METAL_ASSERT(Condition) __metal_impl(__metal_level_assert, __metal_oper_plain, Condition, 0, #Condition, 0, 0, __FILE__, __LINE__);
-#define METAL_EXPECT(Condition) __metal_impl(__metal_level_expect, __metal_oper_plain, Condition, 0, #Condition, 0, 0, __FILE__, __LINE__);
+#define METAL_ASSERT(Condition) __metal_unit_impl(__metal_level_assert, __metal_oper_plain, Condition, 0, #Condition, 0, 0, __FILE__, __LINE__);
+#define METAL_EXPECT(Condition) __metal_unit_impl(__metal_level_expect, __metal_oper_plain, Condition, 0, #Condition, 0, 0, __FILE__, __LINE__);
 
-#define METAL_ASSERT_PREDICATE(Function, Args...) __metal_impl(__metal_level_assert, __metal_oper_predicate, Function(Args), 0, #Function, #Args, 0, __FILE__, __LINE__);
-#define METAL_EXPECT_PREDICATE(Function, Args...) __metal_impl(__metal_level_expect, __metal_oper_predicate, Function(Args), 0, #Function, #Args, 0, __FILE__, __LINE__);
+#define METAL_ASSERT_PREDICATE(Function, Args...) __metal_unit_impl(__metal_level_assert, __metal_oper_predicate, Function(Args), 0, #Function, #Args, 0, __FILE__, __LINE__);
+#define METAL_EXPECT_PREDICATE(Function, Args...) __metal_unit_impl(__metal_level_expect, __metal_oper_predicate, Function(Args), 0, #Function, #Args, 0, __FILE__, __LINE__);
 #define METAL_STATIC_ASSERT_PREDICATE(Function, Args...) METAL_STATIC_ASSERT(Function(Args), #Function "(" #Args ")");
 
-#define METAL_ASSERT_EQUAL(Lhs, Rhs) __metal_impl(__metal_level_assert, __metal_oper_equal, Lhs == Rhs, 0, #Lhs, #Rhs, 0, __FILE__, __LINE__);
-#define METAL_EXPECT_EQUAL(Lhs, Rhs) __metal_impl(__metal_level_expect, __metal_oper_equal, Lhs == Rhs, 0, #Lhs, #Rhs, 0, __FILE__, __LINE__);
+#define METAL_ASSERT_EQUAL(Lhs, Rhs) __metal_unit_impl(__metal_level_assert, __metal_oper_equal, Lhs == Rhs, 0, #Lhs, #Rhs, 0, __FILE__, __LINE__);
+#define METAL_EXPECT_EQUAL(Lhs, Rhs) __metal_unit_impl(__metal_level_expect, __metal_oper_equal, Lhs == Rhs, 0, #Lhs, #Rhs, 0, __FILE__, __LINE__);
 #define METAL_ASSERT_EQUAL_BITWISE(Lhs, Rhs) METAL_BITWISE(__metal_level_assert, Lhs, Rhs, ==, &&, __metal_oper_equal)
 #define METAL_EXPECT_EQUAL_BITWISE(Lhs, Rhs) METAL_BITWISE(__metal_level_expect, Lhs, Rhs, ==, &&, __metal_oper_equal)
 
 #define METAL_STATIC_ASSERT_EQUAL(Lhs, Rhs) METAL_STATIC_ASSERT(Lhs == Rhs, #Lhs " == " #Rhs)
 #define METAL_STATIC_ASSERT_EQUAL_BITWISE(Lhs, Rhs) METAL_STATIC_ASSERT(METAL_BITWISE_EXPR(Rhs, Lhs, ==, &&), " [bitwise] " #Rhs " == " #Lhs)
 
-#define METAL_ASSERT_NOT_EQUAL(Lhs, Rhs) __metal_impl(__metal_level_assert, __metal_oper_not_equal, Lhs != Rhs, 0, #Lhs, #Rhs, 0, __FILE__, __LINE__);
-#define METAL_EXPECT_NOT_EQUAL(Lhs, Rhs) __metal_impl(__metal_level_expect, __metal_oper_not_equal, Lhs != Rhs, 0, #Lhs, #Rhs, 0, __FILE__, __LINE__);
+#define METAL_ASSERT_NOT_EQUAL(Lhs, Rhs) __metal_unit_impl(__metal_level_assert, __metal_oper_not_equal, Lhs != Rhs, 0, #Lhs, #Rhs, 0, __FILE__, __LINE__);
+#define METAL_EXPECT_NOT_EQUAL(Lhs, Rhs) __metal_unit_impl(__metal_level_expect, __metal_oper_not_equal, Lhs != Rhs, 0, #Lhs, #Rhs, 0, __FILE__, __LINE__);
 #define METAL_ASSERT_NOT_EQUAL_BITWISE(Lhs, Rhs) METAL_BITWISE(__metal_level_assert, Lhs, Rhs, != , ||, __metal_oper_not_equal);
 #define METAL_EXPECT_NOT_EQUAL_BITWISE(Lhs, Rhs) METAL_BITWISE(__metal_level_expect, Lhs, Rhs, != , ||, __metal_oper_not_equal);
 
 #define METAL_STATIC_ASSERT_NOT_EQUAL(Lhs, Rhs) METAL_STATIC_ASSERT(Rhs != Lhs, #Lhs " != " #Rhs)
 #define METAL_STATIC_ASSERT_NOT_EQUAL_BITWISE(Lhs, Rhs) METAL_STATIC_ASSERT(METAL_BITWISE_EXPR(Lhs, Rhs, !=, ||), " [bitwise] " #Lhs " != " #Rhs)
 
-#define METAL_ASSERT_CLOSE(Lhs, Rhs, Tolerance) __metal_impl(__metal_level_assert, __metal_oper_close, (Rhs <= (Lhs + Tolerance)) && (Rhs >= (Lhs - Tolerance)), 0, #Lhs, #Rhs, #Tolerance, __FILE__, __LINE__);
-#define METAL_EXPECT_CLOSE(Lhs, Rhs, Tolerance) __metal_impl(__metal_level_expect, __metal_oper_close, (Rhs <= (Lhs + Tolerance)) && (Rhs >= (Lhs - Tolerance)), 0, #Lhs, #Rhs, #Tolerance, __FILE__, __LINE__);
+#define METAL_ASSERT_CLOSE(Lhs, Rhs, Tolerance) __metal_unit_impl(__metal_level_assert, __metal_oper_close, (Rhs <= (Lhs + Tolerance)) && (Rhs >= (Lhs - Tolerance)), 0, #Lhs, #Rhs, #Tolerance, __FILE__, __LINE__);
+#define METAL_EXPECT_CLOSE(Lhs, Rhs, Tolerance) __metal_unit_impl(__metal_level_expect, __metal_oper_close, (Rhs <= (Lhs + Tolerance)) && (Rhs >= (Lhs - Tolerance)), 0, #Lhs, #Rhs, #Tolerance, __FILE__, __LINE__);
 #define METAL_STATIC_ASSERT_CLOSE(Lhs, Rhs, Tolerance) \
     METAL_STATIC_ASSERT((Lhs <= (Rhs + Tolerance)) && (Lhs >= (Rhs - Tolerance)) , #Lhs " == " #Rhs " +/- " #Tolerance)
 
-#define METAL_ASSERT_CLOSE_RELATIVE(Lhs, Rhs, Tolerance) __metal_impl(__metal_level_assert, __metal_oper_close_rel, (Rhs <= (Lhs * (1. + Tolerance))) && (Rhs >= (Lhs * (1. - Tolerance))), 0, #Lhs, #Rhs, #Tolerance, __FILE__, __LINE__);
-#define METAL_EXPECT_CLOSE_RELATIVE(Lhs, Rhs, Tolerance) __metal_impl(__metal_level_expect, __metal_oper_close_rel, (Rhs <= (Lhs * (1. + Tolerance))) && (Rhs >= (Lhs * (1. - Tolerance))), 0, #Lhs, #Rhs, #Tolerance, __FILE__, __LINE__);
+#define METAL_ASSERT_CLOSE_RELATIVE(Lhs, Rhs, Tolerance) __metal_unit_impl(__metal_level_assert, __metal_oper_close_rel, (Rhs <= (Lhs * (1. + Tolerance))) && (Rhs >= (Lhs * (1. - Tolerance))), 0, #Lhs, #Rhs, #Tolerance, __FILE__, __LINE__);
+#define METAL_EXPECT_CLOSE_RELATIVE(Lhs, Rhs, Tolerance) __metal_unit_impl(__metal_level_expect, __metal_oper_close_rel, (Rhs <= (Lhs * (1. + Tolerance))) && (Rhs >= (Lhs * (1. - Tolerance))), 0, #Lhs, #Rhs, #Tolerance, __FILE__, __LINE__);
 #define METAL_STATIC_ASSERT_CLOSE_RELATIVE(Lhs, Rhs, Tolerance) \
     METAL_STATIC_ASSERT((Lhs <= (Rhs * (1. + Tolerance))) && (Lhs >= (Rhs * (1. - Tolerance))) , #Lhs " == " #Rhs " +/- " #Tolerance " ~")
 
-#define METAL_ASSERT_CLOSE_PERCENT(Lhs, Rhs, Tolerance) __metal_impl(__metal_level_assert, __metal_oper_close_perc, (Rhs <= (Lhs * (1. + ( Tolerance / 100.)))) && (Rhs >= (Lhs * (1. - (Tolerance / 100.)))), 0, #Lhs, #Rhs, #Tolerance, __FILE__, __LINE__);
-#define METAL_EXPECT_CLOSE_PERCENT(Lhs, Rhs, Tolerance) __metal_impl(__metal_level_expect, __metal_oper_close_perc, (Rhs <= (Lhs * (1. + ( Tolerance / 100.)))) && (Rhs >= (Lhs * (1. - (Tolerance / 100.)))), 0, #Lhs, #Rhs, #Tolerance, __FILE__, __LINE__);
+#define METAL_ASSERT_CLOSE_PERCENT(Lhs, Rhs, Tolerance) __metal_unit_impl(__metal_level_assert, __metal_oper_close_perc, (Rhs <= (Lhs * (1. + ( Tolerance / 100.)))) && (Rhs >= (Lhs * (1. - (Tolerance / 100.)))), 0, #Lhs, #Rhs, #Tolerance, __FILE__, __LINE__);
+#define METAL_EXPECT_CLOSE_PERCENT(Lhs, Rhs, Tolerance) __metal_unit_impl(__metal_level_expect, __metal_oper_close_perc, (Rhs <= (Lhs * (1. + ( Tolerance / 100.)))) && (Rhs >= (Lhs * (1. - (Tolerance / 100.)))), 0, #Lhs, #Rhs, #Tolerance, __FILE__, __LINE__);
 #define METAL_STATIC_ASSERT_CLOSE_PERCENT(Lhs, Rhs, Tolerance) \
     METAL_STATIC_ASSERT((Rhs <= (Lhs * (1. + (Tolerance / 100.)))) && (Rhs >= (Lhs * (1. - ( Tolerance / 100.)))) , #Lhs " == " #Rhs " +/- " #Tolerance "%")
 
-#define METAL_ASSERT_GE(Lhs, Rhs) __metal_impl(__metal_level_assert, __metal_oper_ge, Lhs >= Rhs, 0, #Lhs, #Rhs, 0, __FILE__, __LINE__);
-#define METAL_EXPECT_GE(Lhs, Rhs) __metal_impl(__metal_level_expect, __metal_oper_ge, Lhs >= Rhs, 0, #Lhs, #Rhs, 0, __FILE__, __LINE__);
+#define METAL_ASSERT_GE(Lhs, Rhs) __metal_unit_impl(__metal_level_assert, __metal_oper_ge, Lhs >= Rhs, 0, #Lhs, #Rhs, 0, __FILE__, __LINE__);
+#define METAL_EXPECT_GE(Lhs, Rhs) __metal_unit_impl(__metal_level_expect, __metal_oper_ge, Lhs >= Rhs, 0, #Lhs, #Rhs, 0, __FILE__, __LINE__);
 #define METAL_ASSERT_GE_BITWISE(Lhs, Rhs) METAL_BITWISE(__metal_level_assert, Lhs, Rhs, >=, &&, __metal_oper_ge)
 #define METAL_EXPECT_GE_BITWISE(Lhs, Rhs) METAL_BITWISE(__metal_level_expect, Lhs, Rhs, >=, &&, __metal_oper_ge)
 #define METAL_STATIC_ASSERT_GE(Lhs, Rhs) METAL_STATIC_ASSERT(Lhs >= Rhs, #Lhs " >= " #Rhs)
 #define METAL_STATIC_ASSERT_GE_BITWISE(Lhs, Rhs) METAL_STATIC_ASSERT(METAL_BITWISE_EXPR(Lhs, Rhs, >=, &&), " [bitwise] " #Lhs " >= " #Rhs)
 
-#define METAL_ASSERT_LE(Lhs, Rhs) __metal_impl(__metal_level_assert, __metal_oper_le, Lhs <= Rhs, 0, #Lhs, #Rhs, 0, __FILE__, __LINE__);
-#define METAL_EXPECT_LE(Lhs, Rhs) __metal_impl(__metal_level_expect, __metal_oper_le, Lhs <= Rhs, 0, #Lhs, #Rhs, 0, __FILE__, __LINE__);
+#define METAL_ASSERT_LE(Lhs, Rhs) __metal_unit_impl(__metal_level_assert, __metal_oper_le, Lhs <= Rhs, 0, #Lhs, #Rhs, 0, __FILE__, __LINE__);
+#define METAL_EXPECT_LE(Lhs, Rhs) __metal_unit_impl(__metal_level_expect, __metal_oper_le, Lhs <= Rhs, 0, #Lhs, #Rhs, 0, __FILE__, __LINE__);
 #define METAL_ASSERT_LE_BITWISE(Lhs, Rhs) METAL_BITWISE(__metal_level_assert, Lhs, Rhs, <=, &&, __metal_oper_le)
 #define METAL_EXPECT_LE_BITWISE(Lhs, Rhs) METAL_BITWISE(__metal_level_expect, Lhs, Rhs, <=, &&, __metal_oper_le)
 #define METAL_STATIC_ASSERT_LE(Lhs, Rhs) METAL_STATIC_ASSERT(Lhs <= Rhs, #Lhs " <= " #Rhs)
 #define METAL_STATIC_ASSERT_LE_BITWISE(Lhs, Rhs) METAL_STATIC_ASSERT(METAL_BITWISE_EXPR(Lhs, Rhs, <=, &&), " [bitwise] " #Lhs " <= " #Rhs)
 
-#define METAL_ASSERT_GREATER(Lhs, Rhs) __metal_impl(__metal_level_assert, __metal_oper_greater, Lhs > Rhs, 0, #Lhs, #Rhs, 0, __FILE__, __LINE__);
-#define METAL_EXPECT_GREATER(Lhs, Rhs) __metal_impl(__metal_level_expect, __metal_oper_greater, Lhs > Rhs, 0, #Lhs, #Rhs, 0, __FILE__, __LINE__);
+#define METAL_ASSERT_GREATER(Lhs, Rhs) __metal_unit_impl(__metal_level_assert, __metal_oper_greater, Lhs > Rhs, 0, #Lhs, #Rhs, 0, __FILE__, __LINE__);
+#define METAL_EXPECT_GREATER(Lhs, Rhs) __metal_unit_impl(__metal_level_expect, __metal_oper_greater, Lhs > Rhs, 0, #Lhs, #Rhs, 0, __FILE__, __LINE__);
 #define METAL_STATIC_ASSERT_GREATER(Lhs, Rhs) METAL_STATIC_ASSERT(Lhs > Rhs, #Lhs " > " #Rhs)
 
-#define METAL_ASSERT_LESSER(Lhs, Rhs) __metal_impl(__metal_level_assert, __metal_oper_lesser, Lhs < Rhs, 0, #Lhs, #Rhs, 0, __FILE__, __LINE__);
-#define METAL_EXPECT_LESSER(Lhs, Rhs) __metal_impl(__metal_level_expect, __metal_oper_lesser, Lhs < Rhs, 0, #Lhs, #Rhs, 0, __FILE__, __LINE__);
+#define METAL_ASSERT_LESSER(Lhs, Rhs) __metal_unit_impl(__metal_level_assert, __metal_oper_lesser, Lhs < Rhs, 0, #Lhs, #Rhs, 0, __FILE__, __LINE__);
+#define METAL_EXPECT_LESSER(Lhs, Rhs) __metal_unit_impl(__metal_level_expect, __metal_oper_lesser, Lhs < Rhs, 0, #Lhs, #Rhs, 0, __FILE__, __LINE__);
 #define METAL_STATIC_ASSERT_LESSER(Lhs, Rhs) METAL_STATIC_ASSERT(Lhs < Rhs, #Lhs " < " #Rhs)
 
 #define METAL_ASSERT_EQUAL_RANGED(LhsBegin, LhsEnd, RhsBegin, RhsEnd) METAL_RANGED(__metal_level_assert, LhsBegin, LhsEnd, RhsBegin, RhsEnd, METAL_ASSERT_EQUAL(*LhsItr, *RhsItr))
@@ -171,7 +171,7 @@ static_assert(Condition, "\n" METAL_LOCATION_STR() " static assertion failed: " 
 #define METAL_ASSERT_LESSER_RANGED(LhsBegin, LhsEnd, RhsBegin, RhsEnd) METAL_RANGED(__metal_level_assert, LhsBegin, LhsEnd, RhsBegin, RhsEnd, METAL_ASSERT_LESSER(*LhsItr, *RhsItr))
 #define METAL_EXPECT_LESSER_RANGED(LhsBegin, LhsEnd, RhsBegin, RhsEnd) METAL_RANGED(__metal_level_expect, LhsBegin, LhsEnd, RhsBegin, RhsEnd, METAL_EXPECT_LESSER(*LhsItr, *RhsItr))
 
-#define __METAL_EXCEPTION(Name, All) catch ( Name & ) { __metal_impl(__metal_level_expect, __metal_oper_exception, 1, 0, #Name, All, 0, __FILE__, __LINE__); }
+#define __METAL_EXCEPTION(Name, All) catch ( Name & ) { __metal_unit_impl(__metal_level_expect, __metal_oper_exception, 1, 0, #Name, All, 0, __FILE__, __LINE__); }
 #define __METAL_EXCEPTIONS_1(All, Arg1)          __METAL_EXCEPTION(Arg1, All)
 #define __METAL_EXCEPTIONS_2(All, Arg1, Args...) __METAL_EXCEPTION(Arg1, All) __METAL_EXCEPTIONS_1(All, Args)
 #define __METAL_EXCEPTIONS_3(All, Arg1, Args...) __METAL_EXCEPTION(Arg1, All) __METAL_EXCEPTIONS_2(All, Args)
@@ -190,31 +190,31 @@ static_assert(Condition, "\n" METAL_LOCATION_STR() " static assertion failed: " 
 
 #define __METAL_EXCEPTIONS(Args...) METAL_CONCAT(__METAL_EXCEPTIONS_, __METAL_PP_NARG(Args)) (#Args, Args)
 
-#define METAL_ASSERT_THROW(Code, Exceptions...) try { Code ; __metal_impl(__metal_level_assert, __metal_oper_exception, 0, 0, "expected throw", #Exceptions, 0, __FILE__, __LINE__); } __METAL_EXCEPTIONS(Exceptions) catch(...) {__metal_impl(__metal_level_assert, __metal_oper_exception, 0, 0, "...", #Exceptions, 0, __FILE__, __LINE__); }
-#define METAL_EXPECT_THROW(Code, Exceptions...) try { Code ; __metal_impl(__metal_level_expect, __metal_oper_exception, 0, 0, "expected throw", #Exceptions, 0, __FILE__, __LINE__); } __METAL_EXCEPTIONS(Exceptions) catch(...) {__metal_impl(__metal_level_expect, __metal_oper_exception, 0, 0, "...", #Exceptions, 0, __FILE__, __LINE__); }
+#define METAL_ASSERT_THROW(Code, Exceptions...) try { Code ; __metal_unit_impl(__metal_level_assert, __metal_oper_exception, 0, 0, "expected throw", #Exceptions, 0, __FILE__, __LINE__); } __METAL_EXCEPTIONS(Exceptions) catch(...) {__metal_unit_impl(__metal_level_assert, __metal_oper_exception, 0, 0, "...", #Exceptions, 0, __FILE__, __LINE__); }
+#define METAL_EXPECT_THROW(Code, Exceptions...) try { Code ; __metal_unit_impl(__metal_level_expect, __metal_oper_exception, 0, 0, "expected throw", #Exceptions, 0, __FILE__, __LINE__); } __METAL_EXCEPTIONS(Exceptions) catch(...) {__metal_unit_impl(__metal_level_expect, __metal_oper_exception, 0, 0, "...", #Exceptions, 0, __FILE__, __LINE__); }
 
-#define METAL_ASSERT_ANY_THROW(Code) try { Code ; __metal_impl(__metal_level_assert, __metal_oper_any_exception, 0, 0, "expected throw", 0, 0, __FILE__, __LINE__); } catch(...) {__metal_impl(__metal_level_assert, __metal_oper_any_exception, 1, 0, "...", 0, 0, __FILE__, __LINE__); }
-#define METAL_EXPECT_ANY_THROW(Code) try { Code ; __metal_impl(__metal_level_expect, __metal_oper_any_exception, 0, 0, "expected throw", 0, 0, __FILE__, __LINE__); } catch(...) {__metal_impl(__metal_level_expect, __metal_oper_any_exception, 1, 0, "...", 0, 0, __FILE__, __LINE__); }
+#define METAL_ASSERT_ANY_THROW(Code) try { Code ; __metal_unit_impl(__metal_level_assert, __metal_oper_any_exception, 0, 0, "expected throw", 0, 0, __FILE__, __LINE__); } catch(...) {__metal_unit_impl(__metal_level_assert, __metal_oper_any_exception, 1, 0, "...", 0, 0, __FILE__, __LINE__); }
+#define METAL_EXPECT_ANY_THROW(Code) try { Code ; __metal_unit_impl(__metal_level_expect, __metal_oper_any_exception, 0, 0, "expected throw", 0, 0, __FILE__, __LINE__); } catch(...) {__metal_unit_impl(__metal_level_expect, __metal_oper_any_exception, 1, 0, "...", 0, 0, __FILE__, __LINE__); }
 
-#define METAL_ASSERT_NO_THROW(Code) try { Code ; __metal_impl(__metal_level_assert, __metal_oper_no_exception, 1, 0, "expected throw", 0, 0, __FILE__, __LINE__); } catch(...) {__metal_impl(__metal_level_assert, __metal_oper_no_exception, 0, 0, "...", 0, 0, __FILE__, __LINE__); }
-#define METAL_EXPECT_NO_THROW(Code) try { Code ; __metal_impl(__metal_level_expect, __metal_oper_no_exception, 1, 0, "expected throw", 0, 0, __FILE__, __LINE__); } catch(...) {__metal_impl(__metal_level_expect, __metal_oper_no_exception, 0, 0, "...", 0, 0, __FILE__, __LINE__); }
+#define METAL_ASSERT_NO_THROW(Code) try { Code ; __metal_unit_impl(__metal_level_assert, __metal_oper_no_exception, 1, 0, "expected throw", 0, 0, __FILE__, __LINE__); } catch(...) {__metal_unit_impl(__metal_level_assert, __metal_oper_no_exception, 0, 0, "...", 0, 0, __FILE__, __LINE__); }
+#define METAL_EXPECT_NO_THROW(Code) try { Code ; __metal_unit_impl(__metal_level_expect, __metal_oper_no_exception, 1, 0, "expected throw", 0, 0, __FILE__, __LINE__); } catch(...) {__metal_unit_impl(__metal_level_expect, __metal_oper_no_exception, 0, 0, "...", 0, 0, __FILE__, __LINE__); }
 
 #define METAL_ENTER_TRY() try {
     
-#define METAL_ASSERT_THROW_EXIT(Exceptions...) __metal_impl(__metal_level_assert, __metal_oper_exception, 0, 0, "expected throw", #Exceptions, 0, __FILE__, __LINE__); } __METAL_EXCEPTIONS(Exceptions) catch(...) {__metal_impl(__metal_level_assert, __metal_oper_exception, 0, 0, "...", #Exceptions, 0, __FILE__, __LINE__); }
-#define METAL_EXPECT_THROW_EXIT(Exceptions...) __metal_impl(__metal_level_expect, __metal_oper_exception, 0, 0, "expected throw", #Exceptions, 0, __FILE__, __LINE__); } __METAL_EXCEPTIONS(Exceptions) catch(...) {__metal_impl(__metal_level_expect, __metal_oper_exception, 0, 0, "...", #Exceptions, 0, __FILE__, __LINE__); }
+#define METAL_ASSERT_THROW_EXIT(Exceptions...) __metal_unit_impl(__metal_level_assert, __metal_oper_exception, 0, 0, "expected throw", #Exceptions, 0, __FILE__, __LINE__); } __METAL_EXCEPTIONS(Exceptions) catch(...) {__metal_unit_impl(__metal_level_assert, __metal_oper_exception, 0, 0, "...", #Exceptions, 0, __FILE__, __LINE__); }
+#define METAL_EXPECT_THROW_EXIT(Exceptions...) __metal_unit_impl(__metal_level_expect, __metal_oper_exception, 0, 0, "expected throw", #Exceptions, 0, __FILE__, __LINE__); } __METAL_EXCEPTIONS(Exceptions) catch(...) {__metal_unit_impl(__metal_level_expect, __metal_oper_exception, 0, 0, "...", #Exceptions, 0, __FILE__, __LINE__); }
 
-#define METAL_ASSERT_ANY_THROW_EXIT() __metal_impl(__metal_level_assert, __metal_oper_any_exception, 0, 0, "expected throw", 0, 0, __FILE__, __LINE__); } catch(...) {__metal_impl(__metal_level_assert, __metal_oper_any_exception, 1, 0, "...", 0, 0, __FILE__, __LINE__); }
-#define METAL_EXPECT_ANY_THROW_EXIT() __metal_impl(__metal_level_expect, __metal_oper_any_exception, 0, 0, "expected throw", 0, 0, __FILE__, __LINE__); } catch(...) {__metal_impl(__metal_level_expect, __metal_oper_any_exception, 1, 0, "...", 0, 0, __FILE__, __LINE__); }
+#define METAL_ASSERT_ANY_THROW_EXIT() __metal_unit_impl(__metal_level_assert, __metal_oper_any_exception, 0, 0, "expected throw", 0, 0, __FILE__, __LINE__); } catch(...) {__metal_unit_impl(__metal_level_assert, __metal_oper_any_exception, 1, 0, "...", 0, 0, __FILE__, __LINE__); }
+#define METAL_EXPECT_ANY_THROW_EXIT() __metal_unit_impl(__metal_level_expect, __metal_oper_any_exception, 0, 0, "expected throw", 0, 0, __FILE__, __LINE__); } catch(...) {__metal_unit_impl(__metal_level_expect, __metal_oper_any_exception, 1, 0, "...", 0, 0, __FILE__, __LINE__); }
 
-#define METAL_ASSERT_NO_THROW_EXIT() __metal_impl(__metal_level_assert, __metal_oper_no_exception, 1, 0, "expected throw", 0, 0, __FILE__, __LINE__); } catch(...) {__metal_impl(__metal_level_assert, __metal_oper_no_exception, 0, 0, "...", 0, 0, __FILE__, __LINE__); }
-#define METAL_EXPECT_NO_THROW_EXIT() __metal_impl(__metal_level_expect, __metal_oper_no_exception, 1, 0, "expected throw", 0, 0, __FILE__, __LINE__); } catch(...) {__metal_impl(__metal_level_expect, __metal_oper_no_exception, 0, 0, "...", 0, 0, __FILE__, __LINE__); }
+#define METAL_ASSERT_NO_THROW_EXIT() __metal_unit_impl(__metal_level_assert, __metal_oper_no_exception, 1, 0, "expected throw", 0, 0, __FILE__, __LINE__); } catch(...) {__metal_unit_impl(__metal_level_assert, __metal_oper_no_exception, 0, 0, "...", 0, 0, __FILE__, __LINE__); }
+#define METAL_EXPECT_NO_THROW_EXIT() __metal_unit_impl(__metal_level_expect, __metal_oper_no_exception, 1, 0, "expected throw", 0, 0, __FILE__, __LINE__); } catch(...) {__metal_unit_impl(__metal_level_expect, __metal_oper_no_exception, 0, 0, "...", 0, 0, __FILE__, __LINE__); }
 
-#define METAL_ASSERT_NO_EXECUTE() __metal_impl(__metal_level_assert, __metal_oper_no_exec, 0, 0, "unexpected execution", 0, 0, __FILE__, __LINE__);
-#define METAL_EXPECT_NO_EXECUTE() __metal_impl(__metal_level_expect, __metal_oper_no_exec, 0, 0, "unexpected execution", 0, 0, __FILE__, __LINE__);
+#define METAL_ASSERT_NO_EXECUTE() __metal_unit_impl(__metal_level_assert, __metal_oper_no_exec, 0, 0, "unexpected execution", 0, 0, __FILE__, __LINE__);
+#define METAL_EXPECT_NO_EXECUTE() __metal_unit_impl(__metal_level_expect, __metal_oper_no_exec, 0, 0, "unexpected execution", 0, 0, __FILE__, __LINE__);
 
-#define METAL_ASSERT_EXECUTE() __metal_impl(__metal_level_assert, __metal_oper_exec, 1, 0, "expected execution", 0, 0, __FILE__, __LINE__);
-#define METAL_EXPECT_EXECUTE() __metal_impl(__metal_level_expect, __metal_oper_exec, 1, 0, "expected execution", 0, 0, __FILE__, __LINE__);
+#define METAL_ASSERT_EXECUTE() __metal_unit_impl(__metal_level_assert, __metal_oper_exec, 1, 0, "expected execution", 0, 0, __FILE__, __LINE__);
+#define METAL_EXPECT_EXECUTE() __metal_unit_impl(__metal_level_expect, __metal_oper_exec, 1, 0, "expected execution", 0, 0, __FILE__, __LINE__);
 
 
 #define METAL_CRITICAL(Check)  __metal_critical ++; Check ; __metal_critical--;
