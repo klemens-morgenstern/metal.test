@@ -31,6 +31,9 @@ class statistic(object):
         gdb.execute("set var __metal_critical = 0")
         fr = frame
 
+        if self.errors > 0:
+            gdb.execute("set var __metal_errored = 1")
+
         if fr.function().name == "main":
             self.cancelled = True
             gdb.write("{} canceling main: {{executed: {}, warnings: {}, errors: {}}}\n".format(
