@@ -61,5 +61,5 @@ int METAL_NO_INLINE __metal_report()
 		  0,
 		  0,
 		  0);
-	return __metal_errored;
+	return __metal_errored != 0;
 }

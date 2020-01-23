@@ -150,6 +150,8 @@ class SelectJsonSink(gdb.Parameter):
             self.sink = sys.stdout
         elif self.value == 'stderr':
             self.sink = sys.stderr
+        else:
+            self.sink = open(self.value, 'w')
         return self.value
 
     set_doc = '''Set output file.'''
@@ -718,7 +720,7 @@ class metal_test_backend(gdb.Breakpoint):
         elif printLevel.value == "error" and (cond or lvl == Level.expect):
             should_print = False
 
-        return res, "{}({}){} {} {}".format(f, l, "critical " if crit else "", lvl_descr, "succeeded" if cond else "failed"), cs, should_print
+        return res, "{}({}){} {} {}".format(f, l, " critical" if crit else "", lvl_descr, "succeeded" if cond else "failed"), cs, should_print
 
 
 mtb = metal_test_backend()
