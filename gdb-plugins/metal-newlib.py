@@ -4,7 +4,17 @@ import gdb
 import os
 import stat
 
+class WorkingDir:
+    def __init__(self):
+        self.value = os.getenv("METAL_CI_SOURCE_DIR")
 
+    def map(self, path):
+        if self.value is None or not path.startswith(self.value):
+            return path
+        else:
+            return path.replace(self.value, os.getcwd())
+
+workingDir = WorkingDir()
 
 class open_flags:
 
@@ -155,7 +165,9 @@ class metal_test_backend(gdb.Breakpoint):
             try:
                 getattr(self, oper)(args, fr)
             except OSError as e:
-                gdb.execute("set var errno = {}".format(e.errno))
+                gdb.write("**NewLib** Error executing {}: {}\n".format(oper, e))
+                try: gdb.execute("set var (*_errno()) = {}".format(e.errno))
+                except: pass
             except Exception as e:
                 gdb.write("Internal error [{}] {}\n".format(oper, e), gdb.STDERR)
 
@@ -202,8 +214,8 @@ class metal_test_backend(gdb.Breakpoint):
 
     def link(self, args, frame):
         fd = int(str(args[3].value(frame)))
-        existing = str(args[1].value(frame))
-        _new = str(args[2].value(frame))
+        existing = workingDir.map(str(args[1].value(frame)))
+        _new = workingDir.map(str(args[2].value(frame)))
         ret = os.link(existing, _new)
         gdb.execute("return {}".format(ret))
 
@@ -220,10 +232,9 @@ class metal_test_backend(gdb.Breakpoint):
         gdb.execute("return {}".format(ret))
 
     def open(self, args, frame):
-        file = str(args[1].value(frame).string())
+        file = workingDir.map(str(args[1].value(frame).string()))
         flags_in = int(str(args[3].value(frame)))
         mode_in = int(str(args[3].value(frame)))
-
 
         if self.open_flags is None:
             self.open_flags = open_flags()
@@ -233,22 +244,28 @@ class metal_test_backend(gdb.Breakpoint):
 
         if flags & os.O_CREAT:
             mode |= stat.S_IRUSR | stat.S_IRGRP | stat.S_IRWXO
+            if file.endswith(".gcda"):
+                base = os.path.dirname(file)
+                if not os.path.exists(base):
+                    gdb.write("**newlib**: Creating folder {}\n".format(base))
+                    os.makedirs(base)
+
 
         fd = os.open(file, flags, mode)
         gdb.execute("return {}".format(fd))
 
     def read(self, args, frame):
         fd = int(str(args[3].value(frame)))
-        len = int(str(args[4].value(frame)))
+        len_ = int(str(args[4].value(frame)))
         ptr = int(str(args[6].value(frame)).split(' ')[0], 0)
 
-        buf = os.read(fd, len)
+        buf = os.read(fd, len_)
 
         gdb.selected_inferior().write_memory(ptr, buf, len(buf))
         gdb.execute("return {}".format(len(buf)))
 
-    def stats(self, args, frame):
-        file = str(args[1].value(frame))
+    def stat(self, args, frame):
+        file = workingDir.map(str(args[1].value(frame)))
         st = os.stat(file)
 
         gdb.execute("set var arg7->st_dev   ={}".format(st.st_dev))
@@ -266,23 +283,24 @@ class metal_test_backend(gdb.Breakpoint):
         gdb.execute("return 0")
 
     def symblink(self, args, frame):
-        existing = str(args[1].value(frame))
-        _new = str(args[2].value(frame))
+        existing = workingDir.map(str(args[1].value(frame)))
+        _new = workingDir.map(str(args[2].value(frame)))
 
         ret = os.symlink(existing, _new)
         gdb.execute("return {}".format(ret))
 
     def unlink(self, args, frame):
-        name = str(args[6].value(frame))
+        name = workingDir.map(str(args[6].value(frame)))
         ret = os.unlink(name)
         gdb.execute("return {}".format(ret))
 
     def write(self, args, frame):
         fd = int(str(args[3].value(frame)))
-        len = int(str(args[4].value(frame)))
+        len_ = int(str(args[4].value(frame)))
+        print("args: ", [str(arg.value(frame)) for arg in args])
         ptr = int(str(args[6].value(frame)).split(' ')[0], 0)
-        buf = gdb.selected_inferior().read_memory(ptr, len)
-        ret = os.write(fd, str(buf))
+        buf = gdb.selected_inferior().read_memory(ptr, len_)
+        ret = os.write(fd, buf)
         gdb.execute("return {}".format(ret))
 
 

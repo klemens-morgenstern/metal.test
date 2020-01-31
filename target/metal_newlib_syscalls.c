@@ -12,6 +12,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <errno.h>
 
 typedef enum metal_func_t
 {
@@ -305,3 +306,44 @@ int _unlink(char* name)
                 );
 }
 
+int _getpid() {return 0;}
+int _kill (int pid, int sig) {
+    if (pid == 0)
+    {
+        _exit(sig);
+        return 0;
+    }
+    else
+        return ESRCH;
+}
+
+
+char dummy_heap[1024*8];
+
+#define __heap_start dummy_heap[0]
+#define __heap_end   dummy_heap[1024*8]
+
+
+void *
+_sbrk (int  incr)
+{
+
+    static char *heap_end;		/* Previous end of heap or 0 if none */
+    char        *prev_heap_end;
+
+    if (0 == heap_end) {
+        heap_end = &__heap_start;			/* Initialize first time round */
+    }
+
+    prev_heap_end  = heap_end;
+    heap_end      += incr;
+    //check
+    if( heap_end < (&__heap_end)) {
+
+    } else {
+        errno = ENOMEM;
+        return (char*)-1;
+    }
+    return (void *) prev_heap_end;
+
+}
