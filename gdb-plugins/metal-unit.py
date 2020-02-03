@@ -4,6 +4,7 @@ import json
 import traceback
 import sys
 import gdb
+import os
 
 str = str
 if sys.version_info[0] < 3:
@@ -204,8 +205,15 @@ def condition(args, frame): return int(args[2].value(frame)) != 0
 def bitwise(args, frame): return int(args[3].value(frame)) != 0
 
 
-def file(args, frame): return str(args[7].value(frame).string())
 
+working_dir = os.getenv("METAL_CI_SOURCE_DIR")
+
+def file(args, frame):
+    path = str(args[7].value(frame).string())
+    if working_dir is None or not path.startswith(working_dir + '/'):
+        return path
+    else:
+        return path.replace(working_dir + '/', '')
 
 def line(args, frame): return int(args[8].value(frame))
 

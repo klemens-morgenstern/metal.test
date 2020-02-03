@@ -297,7 +297,6 @@ class metal_test_backend(gdb.Breakpoint):
     def write(self, args, frame):
         fd = int(str(args[3].value(frame)))
         len_ = int(str(args[4].value(frame)))
-        print("args: ", [str(arg.value(frame)) for arg in args])
         ptr = int(str(args[6].value(frame)).split(' ')[0], 0)
         buf = gdb.selected_inferior().read_memory(ptr, len_)
         ret = os.write(fd, buf)
