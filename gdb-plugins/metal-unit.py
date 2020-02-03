@@ -96,11 +96,16 @@ class case(statistic):
         super(case, self).__init__()
         self.name = name
         self.type = "case"
+        self.line = 0
+        self.file = '**unknown**'
+
 
     def toDict(self):
         par = super(case, self).toDict()
         par["name"] = self.name
         par["type"] = self.type
+        par["line"] = self.line
+        par["file"] = self.file
         return par
 
 class ranged_test(statistic):
@@ -109,6 +114,8 @@ class ranged_test(statistic):
         self.type = "range"
         self.index = 0
         self.critical_fail = False
+        self.line = 0
+        self.file = '**unknown**'
 
     def cancel(self, args, frame, rep):
         self.critical_fail = True
@@ -122,6 +129,8 @@ class ranged_test(statistic):
         par["length"] = len(self.tests)
         par["type"] = self.type
         par["critical_fail"] = self.critical_fail
+        par["line"] = self.line
+        par["file"] = self.file
         return par
 
 
@@ -316,7 +325,11 @@ class metal_test_backend(gdb.Breakpoint):
         self.case.parent = self.current_scope
         self.current_scope = self.case
 
-        gdb.write("{} entering test case [{}]\n".format(loc_str(args, frame), id))
+        f, l, str_ = loc_tup(args, frame)
+        self.case.file = f
+        self.case.line = l
+
+        gdb.write("{} entering test case [{}]\n".format(str_, id))
 
     def exit_case(self, args, frame):
         case_id = str_arg(args, frame, 0)
@@ -341,7 +354,7 @@ class metal_test_backend(gdb.Breakpoint):
 
 
         cond = condition(args, frame)
-        if cond:
+        if not cond:
             descr = str_arg(args, frame, 0)
             lhs = str_arg(args, frame, 1)
             rhs = str_arg(args, frame, 2)
@@ -352,10 +365,14 @@ class metal_test_backend(gdb.Breakpoint):
 
 
         descr = str_arg(args, frame, 0)
-        gdb.write("{} entering ranged test[{}]\n".format(loc_str(args, frame), descr))
+
+        f, l, str_ = loc_tup(args, frame)
+        gdb.write("{} entering ranged test[{}]\n".format(str_, descr))
 
         self.range = ranged_test()
         self.range.parent = self.current_scope
+        self.range.file = f
+        self.range.line = l
         self.current_scope.children.append(self.range)
         self.current_scope = self.range
 
@@ -422,7 +439,7 @@ class metal_test_backend(gdb.Breakpoint):
             gdb.write("{} [predicate]: {}({})\n".format(prefix, name, args_))
         ck["name"] = name
         ck["args"] = args_
-        ck["type"] = "plain"
+        ck["type"] = "predicate"
         current_scope.append_test(ck, args, frame, self.report_canceled)
 
     def equal(self, args, frame):
@@ -492,7 +509,7 @@ class metal_test_backend(gdb.Breakpoint):
         ck["tolerance"] = tolerance
         ck["lhs_val"] = lhs_val
         ck["rhs_val"] = rhs_val
-        ck["tolerance_vale"] = tolerance_val
+        ck["tolerance_val"] = tolerance_val
         current_scope.append_test(ck, args, frame, self.report_canceled)
 
     def close_rel(self, args, frame):
@@ -519,7 +536,7 @@ class metal_test_backend(gdb.Breakpoint):
         ck["tolerance"] = tolerance
         ck["lhs_val"] = lhs_val
         ck["rhs_val"] = rhs_val
-        ck["tolerance_vale"] = tolerance_val
+        ck["tolerance_val"] = tolerance_val
         current_scope.append_test(ck, args, frame, self.report_canceled)
 
     def close_perc(self, args, frame):
@@ -544,7 +561,7 @@ class metal_test_backend(gdb.Breakpoint):
         ck["tolerance"] = tolerance
         ck["lhs_val"] = lhs_val
         ck["rhs_val"] = rhs_val
-        ck["tolerance_vale"] = tolerance_val
+        ck["tolerance_val"] = tolerance_val
         current_scope.append_test(ck, args, frame, self.report_canceled)
 
 
@@ -586,7 +603,7 @@ class metal_test_backend(gdb.Breakpoint):
         if should_print:
             gdb.write("{} [{}comparison]: {}; [{} > {}]\n".format(prefix, bw_s, descr, lhs_val, rhs_val))
 
-        ck["type"] = "ge"
+        ck["type"] = "greater"
         ck["bitwise"] = bw
         ck["lhs"] = lhs
         ck["rhs"] = rhs
