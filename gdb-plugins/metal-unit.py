@@ -44,8 +44,8 @@ class statistic(object):
         try:
 
             while fr != None:
-                is_metal_call = fr.function().name.startswith("__metal_call(") or fr.function().name == "__metal_call"
-                is_main = fr.function().name == "main"
+                is_metal_call = fr.function() and fr.function().name.startswith("__metal_call(") or fr.function().name == "__metal_call"
+                is_main = fr.function() and fr.function().name == "main"
 
                 if is_metal_call:
                     stat_id = str_arg(args, frame, 0)
@@ -284,12 +284,16 @@ def print_from_frame(args, frame, bw, frame_nr, name):
                 for b in mem:
                     res += bin(ord(b))[2:]
 
-
             return "0b" + res
 
-
         val = gdb.parse_and_eval(name)
-        str(val)
+        if val.type.code == gdb.TYPE_CODE_PTR:
+            val = val.defererence()
+
+        try:
+            return val.format_string()
+        except:
+            return str(val)
 
 class metal_test_backend(gdb.Breakpoint):
     def __init__(self):
